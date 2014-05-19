@@ -1,0 +1,83 @@
+
+import java.security.*;
+
+import javax.crypto.*;
+import javax.crypto.spec.*;
+
+public class Encryptor {
+
+	private SecretKeySpec key;
+	private Cipher aes;
+	
+	public Encryptor() {
+
+		String passphrase = "p2ona2sdfa3w9023rkadfz1";
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("SHA");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return; //Unreachable
+		}
+		digest.update(passphrase.getBytes());
+		key = new SecretKeySpec(digest.digest(), 0, 16, "AES");
+		
+		
+		try {
+			aes = Cipher.getInstance("AES/ECB/PKCS5Padding");
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return; //Unreachable
+		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+			return; //Unreachable
+		}
+	}
+	
+	public String hashSHA256(String string) {
+		//TODO
+		return "dummystring";
+	}
+	
+	public byte[] encrypt(String cleartext) {
+		try {
+			aes.init(Cipher.ENCRYPT_MODE, key);
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+			return null; //Unreachable
+		}
+		byte[] ciphertext;
+		try {
+			ciphertext = aes.doFinal("my cleartext".getBytes());
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+			return null; //Unreachable
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
+			return null; //Unreachable
+		}
+		return ciphertext;
+	}
+	
+	public String decrypt(byte[] ciphertext) {
+		try {
+			aes.init(Cipher.DECRYPT_MODE, key);
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+			return null; //Unreachable
+		}
+		String cleartext;
+		try {
+			cleartext = new String(aes.doFinal(ciphertext));
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+			return null; //Unreachable
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
+			return null; //Unreachable
+		}
+		return cleartext;
+		
+	}
+	
+}

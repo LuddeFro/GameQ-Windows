@@ -1,0 +1,21 @@
+import java.util.List;
+import java.util.ArrayList;
+
+import org.jnetpcap.PcapIf;
+
+
+
+public class PacketHandler {
+
+	
+	public PacketHandler() {
+		
+		
+		List<PcapIf> alldevs = new ArrayList<PcapIf>(); // Will be filled with NICs 
+		
+		
+		
+	}
+	
+	
+}

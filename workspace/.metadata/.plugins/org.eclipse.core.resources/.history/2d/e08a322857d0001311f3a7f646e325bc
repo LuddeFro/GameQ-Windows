@@ -1,0 +1,163 @@
+import java.awt.AWTException;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import javax.swing.JFrame;
+
+public class Main {
+	
+	public static ConnectionHandler connectionsHandler;
+	public static DataModel dataHandler;
+	public static JFrame frame;
+	public static void main(String args[]) {
+		connectionsHandler = new ConnectionHandler();
+		dataHandler = new DataModel();
+		// setup agent program
+		TrayIcon trayIcon = null;
+		if (SystemTray.isSupported()) {
+			SystemTray tray = SystemTray.getSystemTray();
+			Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/Qwhite.png")); 
+			
+			ActionListener logListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 if (dataHandler.getBolIsLoggedIn()) {
+	                	 connectionsHandler.postLogout();
+	                	 setupWindow();
+	                	 setDisconnected();
+	                 } else {
+	                	 
+	                 }
+	             }
+	         };
+	         
+	         ActionListener toggleListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 //TODO
+	             }
+	         };
+	         
+	         ActionListener iconListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 //TODO 
+	             }
+	         };
+	         
+	         ActionListener quitListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	            	 if (dataHandler.getBolIsLoggedIn()) {
+	            		 connectionsHandler.postLogout();
+	            	 }
+	            	 try {
+						dataHandler.save();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					} finally {
+						System.exit(0);
+					}
+	             }
+	         };	 
+	         
+	         /*
+	         ActionListener listener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 
+	             }
+	         };*/
+	         
+	         
+	         PopupMenu popup = new PopupMenu(); 
+	         
+	         MenuItem logItem = new MenuItem();
+	         MenuItem toggleItem = new MenuItem();
+	         MenuItem quitItem = new MenuItem();
+	         
+	         logItem.addActionListener(logListener);
+	         toggleItem.addActionListener(toggleListener);
+	         quitItem.addActionListener(quitListener);
+	         
+	         toggleItem.setLabel("Resume queue monitoring");
+	         logItem.setLabel("Sign in / Sign up");
+	         quitItem.setLabel("Quit");
+	         
+	         toggleItem.setEnabled(false);
+	         
+	         popup.add(toggleItem);
+	         popup.add(logItem);
+	         popup.add(quitItem);
+	         
+	         
+	         
+	         
+	         // construct a TrayIcon
+	         trayIcon = new TrayIcon(trayImage, "GameQ", popup);
+	         // set the TrayIcon properties
+	         trayIcon.addActionListener(iconListener);
+	         // ...
+	         // add the tray image
+	         try {
+	             tray.add(trayIcon);
+	         } catch (AWTException e) {
+	             System.err.println(e);
+	         }
+		} else {
+			//some kind of error handling
+			//TODO
+			
+		}
+		
+	}
+	
+	public static void setupWindow() {
+		if (frame == null) {
+			frame = new JFrame("GameQ");
+		}
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/Qwhite.png")));
+		// add components
+		// frame.getContentPane().add(empyLabel, BorderLayout.CENTER);
+		
+		frame.getContentPane().add();
+		
+		frame.pack();
+		frame.setVisible(true);
+		
+	}
+	
+	public static void connect() {
+		//TODO
+	}
+	
+	public static void disconnect() {
+		//TODO
+	}
+	
+	public static void setConnected() {
+		//TODO
+	}
+	public static void setDisconnected() {
+		//TODO
+	}
+	
+	public static void logout() {
+		//TODO
+	}
+	public static void login() {
+		//TODO
+	}
+	private static void toggle() {
+		//TODO
+	}
+	private static void toggleOn() {
+		//TODO
+	}
+	private static void toggleOff() {
+		//TODO
+	}
+}

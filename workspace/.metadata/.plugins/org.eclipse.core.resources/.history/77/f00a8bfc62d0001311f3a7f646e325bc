@@ -1,0 +1,234 @@
+import java.awt.AWTException;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+
+public class Main {
+	
+	public static ConnectionHandler connectionsHandler;
+	public static DataModel dataHandler;
+	public static JFrame frame;
+	public static boolean bolRegging;
+	public static JTextField txtEmail;
+	public static JTextField txtPassword;
+	public static JTextField txtSecretQ;
+	public static JTextField txtSecret;
+	public static void main(String args[]) {
+		connectionsHandler = new ConnectionHandler();
+		dataHandler = new DataModel();
+		// setup agent program
+		TrayIcon trayIcon = null;
+		if (SystemTray.isSupported()) {
+			SystemTray tray = SystemTray.getSystemTray();
+			Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/Qwhite.png")); 
+			
+			ActionListener logListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 if (dataHandler.getBolIsLoggedIn()) {
+	                	 connectionsHandler.postLogout();
+	                	 setupWindow();
+	                	 setDisconnected();
+	                 } else {
+	                	 setupWindow();
+	                 }
+	             }
+	         };
+	         
+	    
+	         
+	         ActionListener toggleListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 toggle();
+	             }
+	         };
+	         
+	         ActionListener iconListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 if (dataHandler.getBolIsLoggedIn()) {
+	                	 toggle();
+	                 } else {
+	                	 setupWindow();
+	                 }
+	             }
+	         };
+	         
+	         ActionListener quitListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	            	 if (dataHandler.getBolIsLoggedIn()) {
+	            		 connectionsHandler.postLogout();
+	            	 }
+	            	 try {
+						dataHandler.save();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					} finally {
+						System.exit(0);
+					}
+	             }
+	         };	 
+	         
+	         /*
+	         ActionListener listener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 
+	             }
+	         };*/
+	         
+	         
+	         PopupMenu popup = new PopupMenu(); 
+	         
+	         MenuItem logItem = new MenuItem();
+	         MenuItem toggleItem = new MenuItem();
+	         MenuItem quitItem = new MenuItem();
+	         
+	         logItem.addActionListener(logListener);
+	         toggleItem.addActionListener(toggleListener);
+	         quitItem.addActionListener(quitListener);
+	         
+	         toggleItem.setLabel("Resume queue monitoring");
+	         logItem.setLabel("Sign in / Sign up");
+	         quitItem.setLabel("Quit");
+	         
+	         toggleItem.setEnabled(false);
+	         
+	         popup.add(toggleItem);
+	         popup.add(logItem);
+	         popup.add(quitItem);
+	         
+	         
+	         
+	         
+	         // construct a TrayIcon
+	         trayIcon = new TrayIcon(trayImage, "GameQ", popup);
+	         // set the TrayIcon properties
+	         trayIcon.addActionListener(iconListener);
+	         // ...
+	         // add the tray image
+	         try {
+	             tray.add(trayIcon);
+	         } catch (AWTException e) {
+	             System.err.println(e);
+	         }
+		} else {
+			//some kind of error handling
+			//system tray is not supported
+			//TODO
+			
+		}
+		
+	}
+	
+	public static void setupWindow() {
+		bolRegging = false;
+		if (frame == null) {
+			frame = new JFrame("GameQ");
+		}
+		
+		ActionListener loginListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Main.attemptLogin();
+            }
+        };
+        
+        ActionListener registerListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (bolRegging) {
+                	if (txtSecret == null || txtSecretQ == null) {
+                		return;
+                	} else {
+                		txtSecret.setVisible(false);
+                		txtSecretQ.setVisible(false);
+                	}
+                } else {
+                	if (txtSecret == null || txtSecretQ == null) {
+                		return;
+                	} else {
+                		txtSecret.setVisible(true);
+                		txtSecretQ.setVisible(true);
+                	}
+                }
+                bolRegging = !bolRegging;
+            }
+        };
+        
+        
+		
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/Qwhite.png")));
+		
+		
+		// add components
+		// frame.getContentPane().add(empyLabel, BorderLayout.CENTER);
+		
+		JButton btnLogin = new JButton();
+		btnLogin.setText("Sign In");
+		btnLogin.addActionListener(loginListener);
+		
+		txtEmail = new JTextField(30);
+		txtPassword = new JTextField(30);
+		txtSecretQ = new JTextField(30);
+		txtSecret = new JTextField(30);
+		
+		TextPrompt promptEmail = new TextPrompt("Email", txtEmail);
+		promptEmail.changeAlpha(0.5f);
+		TextPrompt promptPassword = new TextPrompt("Password", txtPassword);
+		promptPassword.changeAlpha(0.5f);
+		TextPrompt promptSecretQ = new TextPrompt("Secret Question/Hint", txtSecretQ);
+		promptSecretQ.changeAlpha(0.5f);
+		TextPrompt promptSecret = new TextPrompt("Secret Answer", txtSecret);
+		promptSecret.changeAlpha(0.5f);
+		
+		
+		
+		
+		frame.getContentPane().add();
+		
+		frame.pack();
+		frame.setVisible(true);
+		
+	}
+	
+	public static void connect() {
+		//TODO
+	}
+	
+	public static void disconnect() {
+		//TODO
+	}
+	
+	public static void setConnected() {
+		//TODO
+	}
+	public static void setDisconnected() {
+		//TODO
+	}
+	
+	public static void logout() {
+		//TODO
+	}
+	public static void attemptLogin() {
+		//TODO
+	}
+	public static void attemptRegister() {
+		//TODO
+	}
+	private static void toggle() {
+		//TODO
+	}
+	private static void toggleOn() {
+		//TODO
+	}
+	private static void toggleOff() {
+		//TODO
+	}
+}

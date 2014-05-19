@@ -1,0 +1,111 @@
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.jnetpcap.Pcap;
+import org.jnetpcap.PcapBpfProgram;
+import org.jnetpcap.PcapIf;
+import org.jnetpcap.packet.PcapPacket;
+import org.jnetpcap.packet.PcapPacketHandler;
+
+
+
+public class PacketHandler {
+
+	private static final String filterString = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp src portrange 27015-27030 or udp dst port 27005";
+	
+	public PacketHandler() {
+		
+		
+		List<PcapIf> alldevs = new ArrayList<PcapIf>(); // Will be filled with NICs 
+		StringBuilder errbuf = new StringBuilder(); // For any error msgs 
+		
+		//list devices on the system
+		int r = Pcap.findAllDevs(alldevs, errbuf);  
+        if (r == Pcap.NOT_OK || alldevs.isEmpty()) {  
+            System.err.printf("Can't read list of devices, error is %s", errbuf  
+                .toString());  
+            return;  
+        }  
+		
+        System.out.println("Network devices found:");  
+        
+        int i = 0;  
+        PcapIf mainDevice;
+        for (PcapIf device : alldevs) {  
+            String description =  
+                (device.getDescription() != null) ? device.getDescription()  
+                    : "No description available";  
+            System.out.printf("#%d: %s [%s]\n", i++, device.getName(), description);
+            
+            //monitor each device
+            openStreams(device, errbuf);
+            
+        }  
+        
+	}
+	
+	private void openStreams(PcapIf device, StringBuilder errbuf) {
+		int snaplen = 64 * 1024;           // Capture all packets, no trucation  
+        int flags = Pcap.MODE_NON_PROMISCUOUS; // capture all packets  
+        int timeout = 10 * 1000;           // 10 seconds in millis  
+        Pcap pcap =  
+            Pcap.openLive(device.getName(), snaplen, flags, timeout, errbuf);  
+  
+        if (pcap == null) {  
+            System.err.printf("Error while opening device for capture: "  
+                + errbuf.toString());  
+            return;  
+        }  
+        
+        PcapPacketHandler<String> jpacketHandler = new PcapPacketHandler<String>() {  
+        	  
+            public void nextPacket(PcapPacket packet, String user) {  
+  
+                System.out.printf("Received packet at %s caplen=%-4d len=%-4d %s\n",  
+                    new Date(packet.getCaptureHeader().timestampInMillis()),   
+                    packet.getCaptureHeader().caplen(),  // Length actually captured  
+                    packet.getCaptureHeader().wirelen(), // Original length   
+                    user                                 // User supplied object  
+                    );  
+            }  
+        };  
+        
+        PcapBpfProgram filter = new PcapBpfProgram();
+        String expression = filterString;
+        int optimize = 0; // 1 means true, 0 means false
+        int netmask = 0;
+        
+        int r = pcap.compile(filter, expression, optimize, netmask);
+        if (r != Pcap.OK) {
+          System.out.println("Filter error: " + pcap.getErr());
+        }
+        pcap.setFilter(filter);
+        
+        
+        PcapPacketHandler<String> handler = new PcapPacketHandler<String>() {  
+        	  
+            public void nextPacket(PcapPacket packet, String user) {  
+  
+                System.out.printf("Received packet at %s caplen=%-4d len=%-4d %s\n",  
+                    new Date(packet.getCaptureHeader().timestampInMillis()),   
+                    packet.getCaptureHeader().caplen(),  // Length actually captured
+                    packet.getCaptureHeader().wirelen(), // Original length   
+                    user                                 // User supplied object  
+                    );  
+            }  
+        }; 
+     
+        int cnt = 0; // Capture packet count
+        String out = "packet caught"; // Our custom object to send into the handler
+        System.out.println("stream opening");
+        pcap.loop(cnt, handler, out); // Each packet will be dispatched to the handler
+        System.out.println("stream closing");
+        pcap.close();
+        System.out.println("stream closed");
+        
+	}
+	
+	
+}

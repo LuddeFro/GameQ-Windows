@@ -1,0 +1,14 @@
+
+public class Encryptor {
+
+	
+	public String hashSHA256(String string) {
+		//TODO
+		return "dummystring";
+	}
+	
+	public String encrypt(String string) {
+		return dummystring;
+	}
+	
+}

@@ -1,0 +1,157 @@
+import java.awt.AWTException;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class Main {
+	
+	private ConnectionHandler connectionsHandler;
+	
+	public static void main(String args[]) {
+		connectionsHandler = new ConnectionHandler();
+		
+		// setup agent program
+		TrayIcon trayIcon = null;
+		if (SystemTray.isSupported()) {
+			SystemTray tray = SystemTray.getSystemTray();
+			Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/Qwhite.png")); 
+			
+			ActionListener logListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 //TODO
+	             }
+	         };
+	         
+	         ActionListener toggleListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 //TODO
+	             }
+	         };
+	         
+	         ActionListener iconListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 
+	             }
+	         };
+	         
+	         ActionListener quitListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	            	 connectionsHandler.postLogout();
+	            	 System.exit(0);
+	            	 
+	             }
+	         };	 
+	         
+	         /*
+	         ActionListener listener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	                 
+	             }
+	         };*/
+	         
+	         
+	         PopupMenu popup = new PopupMenu(); 
+	         
+	         MenuItem logItem = new MenuItem();
+	         MenuItem toggleItem = new MenuItem();
+	         MenuItem quitItem = new MenuItem();
+	         
+	         logItem.addActionListener(logListener);
+	         toggleItem.addActionListener(toggleListener);
+	         quitItem.addActionListener(quitListener);
+	         
+	         toggleItem.setLabel("Resume queue monitoring");
+	         logItem.setLabel("Sign in / Sign up");
+	         quitItem.setLabel("Quit");
+	         
+	         toggleItem.setEnabled(false);
+	         
+	         popup.add(toggleItem);
+	         popup.add(logItem);
+	         popup.add(quitItem);
+	         
+	         
+	         
+	         
+	         // construct a TrayIcon
+	         trayIcon = new TrayIcon(trayImage, "GameQ", popup);
+	         // set the TrayIcon properties
+	         trayIcon.addActionListener(iconListener);
+	         // ...
+	         // add the tray image
+	         try {
+	             tray.add(trayIcon);
+	         } catch (AWTException e) {
+	             System.err.println(e);
+	         }
+		} else {
+			//some kind of error handling
+			//TODO
+			
+		}
+		
+	}
+	
+	public String getToken() {
+		//TODO
+		return null;
+	}
+	public String getEmail() {
+		//TODO
+		return null;
+	}
+	public String getPassword() {
+		//TODO
+		return null;
+	}
+	public String getBolIsLoggedIn() {
+		//TODO
+		return null;
+	}
+	public String getBolIsRegisteredForNotifications() {
+		//TODO
+		return null;
+	}
+	
+	public void setToken(String token) {
+		//TODO
+	}
+	public void setEmail(String email) {
+		//TODO
+	}
+	public void setPassword(String password) {
+		//TODO
+	}
+	public void setBolIsLoggedIn(boolean bolIsLoggedIn) {
+		//TODO
+	}
+	public void setBolIsRegisteredForNotifications(boolean bolIsRegisteredForNotifications) {
+		//TODO
+	}
+	public void setConnected() {
+		//TODO
+	}
+	public void setDisconnected() {
+		//TODO
+	}
+	public void logout() {
+		//TODO
+	}
+	public void login() {
+		//TODO
+	}
+	private void toggle() {
+		//TODO
+	}
+	private void toggleOn() {
+		//TODO
+	}
+	private void toggleOff() {
+		//TODO
+	}
+}

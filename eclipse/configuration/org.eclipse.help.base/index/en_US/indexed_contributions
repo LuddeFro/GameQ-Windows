@@ -1,0 +1,18 @@
+#This is a generated file; do not edit.
+#Mon Apr 28 11:38:42 CEST 2014
+org.eclipse.epp.mpc.ui=org.eclipse.epp.mpc.ui\n1.2.1.v20140219-1000
+org.eclipse.ui.intro.universal=org.eclipse.ui.intro.universal\n3.2.600.v20130326-1254
+org.eclipse.platform=org.eclipse.platform\n4.3.2.v20140221-1700
+org.eclipse.platform.doc.isv=org.eclipse.platform.doc.isv\n4.3.2.v20140205-0929
+org.eclipse.platform.doc.user=org.eclipse.platform.doc.user\n4.3.1.v20140123-0938
+org.eclipse.jdt.doc.isv=org.eclipse.jdt.doc.isv\n3.9.2.v20140205-0929
+org.eclipse.ui.cheatsheets=org.eclipse.ui.cheatsheets\n3.4.200.v20130326-1254
+org.eclipse.egit.doc=org.eclipse.egit.doc\n3.2.0.201312181205-r
+org.eclipse.pde=org.eclipse.pde\n3.8.100.v20140221-1700
+org.eclipse.epp.mpc.help.ui=org.eclipse.epp.mpc.help.ui\n1.2.1.v20140219-1000
+org.eclipse.help=org.eclipse.help\n3.6.0.v20130326-1254
+org.eclipse.help.base=org.eclipse.help.base\n4.0.1.v20140221-1700
+org.eclipse.jdt=org.eclipse.jdt\n3.9.1.v20140221-1700
+org.eclipse.ui.intro=org.eclipse.ui.intro\n3.4.200.v20130326-1254
+org.eclipse.pde.doc.user=org.eclipse.pde.doc.user\n3.9.2.v20140205-0929
+org.eclipse.jdt.doc.user=org.eclipse.jdt.doc.user\n3.9.1.v20140205-0929
