@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;timeHandler.java&apos; to &apos;TimeHandler.java&apos;&#x0D;&#x0A;- Original project: &apos;GameQ-Windows&apos;&#x0D;&#x0A;- Original element: &apos;timeHandler.java&apos;&#x0D;&#x0A;- Renamed element: &apos;TimeHandler.java&apos;" description="Rename compilation unit &apos;timeHandler.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src&lt;{timeHandler.java" name="TimeHandler.java" references="false" stamp="1401190080669" version="1.0"/>
+</session>
