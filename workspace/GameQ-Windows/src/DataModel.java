@@ -12,12 +12,11 @@ import org.apache.commons.io.FileUtils;
 public class DataModel {
 
 	private static String filename;
-	private String token;
-	private String email;
-	private String password;
-	private boolean bolIsLoggedIn;
-	private boolean bolIsRegisteredForNotifications;
-	public Encryptor enc;
+	private static String token;
+	private static String email;
+	private static String password;
+	private static boolean bolIsLoggedIn;
+	private static boolean bolIsRegisteredForNotifications;
 	
 	public DataModel() {
 		token = "";
@@ -25,7 +24,6 @@ public class DataModel {
 		password = "";
 		bolIsLoggedIn = false;
 		bolIsRegisteredForNotifications = false;
-		enc = new Encryptor();
 		
 		
 		//System.out.println(filename);
@@ -46,36 +44,36 @@ public class DataModel {
 		
 	}
 	
-	public String getToken() {
+	public static String getToken() {
 		return token;
 	}
-	public String getEmail() {
+	public static String getEmail() {
 		return email;
 	}
-	public String getPassword() {
+	public static String getPassword() {
 		return password;
 	}
-	public boolean getBolIsLoggedIn() {
+	public static boolean getBolIsLoggedIn() {
 		return bolIsLoggedIn;
 	}
-	public boolean getBolIsRegisteredForNotifications() {
+	public static boolean getBolIsRegisteredForNotifications() {
 		return bolIsRegisteredForNotifications;
 	}
 	
-	public void setToken(String token) {
-		this.token = token;
+	public static void setToken(String token) {
+		DataModel.token = token;
 	}
-	public void setEmail(String email) {
-		this.email = email;
+	public static void setEmail(String email) {
+		DataModel.email = email;
 	}
-	public void setPassword(String password) {
-		this.password = password;
+	public static void setPassword(String password) {
+		DataModel.password = password;
 	}
-	public void setBolIsLoggedIn(boolean bolIsLoggedIn) {
-		this.bolIsLoggedIn = bolIsLoggedIn;
+	public static void setBolIsLoggedIn(boolean bolIsLoggedIn) {
+		DataModel.bolIsLoggedIn = bolIsLoggedIn;
 	}
-	public void setBolIsRegisteredForNotifications(boolean bolIsRegisteredForNotifications) {
-		this.bolIsRegisteredForNotifications = bolIsRegisteredForNotifications;
+	public static void setBolIsRegisteredForNotifications(boolean bolIsRegisteredForNotifications) {
+		DataModel.bolIsRegisteredForNotifications = bolIsRegisteredForNotifications;
 	}
 	
 	
@@ -94,7 +92,7 @@ public class DataModel {
 			return;
 		} 
 		
-		byte[] bytes = enc.encrypt("email="+email+"&password="+password+"&token="+token+"&bolIsLoggedIn="+bolIsLoggedIn+"&bolIsRegisteredForNotifications="+bolIsRegisteredForNotifications);
+		byte[] bytes = Encryptor.encrypt("email="+email+"&password="+password+"&token="+token+"&bolIsLoggedIn="+bolIsLoggedIn+"&bolIsRegisteredForNotifications="+bolIsRegisteredForNotifications);
 		/*FileWriter fw;
 		try {
 			fw = new FileWriter(filename, true);
@@ -149,7 +147,7 @@ public class DataModel {
 		
 		byte[] bytes = FileUtils.readFileToByteArray(file);
 		
-		String fullDecrypted = enc.decrypt(bytes);
+		String fullDecrypted = Encryptor.decrypt(bytes);
 		String[] splitString = fullDecrypted.split("&");
 		if (splitString.length != 5) {
 			System.out.println(splitString[0]);

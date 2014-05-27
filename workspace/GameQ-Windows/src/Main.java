@@ -25,6 +25,8 @@ public class Main {
 	public static DataModel dataHandler;
 	
 	public static boolean bolRegging;
+	public static boolean bolGettingQuestion;
+	public static boolean bolAskingQuestion;
 	
 	public static TrayIcon trayIcon;
 	public static MenuItem logItem;
@@ -46,12 +48,17 @@ public class Main {
 			ActionListener logListener = new ActionListener() {
 	             public void actionPerformed(ActionEvent e) {
 	            	 System.out.println("pressed login/logout");
-	                 if (dataHandler.getBolIsLoggedIn()) {
+	                 if (DataModel.getBolIsLoggedIn()) {
 	                	 connectionsHandler.postLogout();
-	                	 windowHandler = new WindowHandler();
+	                	 if (windowHandler == null) {
+	                		 windowHandler = new WindowHandler();
+	                	 }
 	                	 windowHandler.setupWindow();
 	                	 setDisconnected();
 	                 } else {
+	                	 if (windowHandler == null) {
+	                		 windowHandler = new WindowHandler();
+	                	 }
 	                	 windowHandler.setupWindow();
 	                 }
 	             }
@@ -73,9 +80,12 @@ public class Main {
 				public void mouseClicked(MouseEvent e) {
 					if (e.getButton() == MouseEvent.BUTTON1) {
 						 System.out.println("pressed icon");
-		                 if (dataHandler.getBolIsLoggedIn()) {
+		                 if (DataModel.getBolIsLoggedIn()) {
 		                	 toggle();
 		                 } else {
+		                	 if (windowHandler == null) {
+		                		 windowHandler = new WindowHandler();
+		                	 }
 		                	 windowHandler.setupWindow();
 		                 }
 					}
@@ -105,7 +115,7 @@ public class Main {
 	         ActionListener quitListener = new ActionListener() {
 	             public void actionPerformed(ActionEvent e) {
 	            	 System.out.println("pressed quit");
-	            	 if (dataHandler.getBolIsLoggedIn()) {
+	            	 if (DataModel.getBolIsLoggedIn()) {
 	            		 connectionsHandler.postLogout();
 	            	 }
 	            	 try {
@@ -207,7 +217,7 @@ public class Main {
 	 * connection loss in <1min
 	 */
 	public static void forceLogout() {
-		
+		setDisconnected();
 	}
 	
 	/**
@@ -220,6 +230,18 @@ public class Main {
 	 * attempts to register via connectionsHandler
 	 */
 	public static void attemptRegister() {
+		//TODO
+	}
+	/**
+	 * attempts to get the secret question via connectionsHandler
+	 */
+	public static void attemptGetQuestion() {
+		//TODO
+	}
+	/**
+	 * attempts to validate secret via connectionsHandler
+	 */
+	public static void attemptAnswerQuestion() {
 		//TODO
 	}
 	/**

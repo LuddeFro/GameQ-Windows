@@ -1,13 +1,22 @@
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 
 
 
@@ -17,22 +26,34 @@ public class WindowHandler {
 	public static final int frameWidth = 500;
 	public static final int frameHeight = 300;
 	
+	public static final int imageSize = 256;
 	
 	public static final int middleXOffset = 10;
     public static final int fieldWidth = 200;
     public static final int fieldYOffset = 20;
     public static final int fieldHeight = 25;
     public static final int bonusFieldYOffset = fieldYOffset*2*3/4 + fieldHeight;
-    public static final int buttonWidth = 120;
-    public static final int buttonHeight = 30;
+    public static final int bonusField2YOffset = (bonusFieldYOffset - fieldYOffset) + bonusFieldYOffset;
+    public static final int bonusField3YOffset = (bonusFieldYOffset - fieldYOffset) + bonusField2YOffset;
+    public static final int bonusField4YOffset = (bonusFieldYOffset - fieldYOffset) + bonusField3YOffset;
+    public static final int buttonWidth = 95;
+    public static final int buttonHeight = 25;
     public static final int buttonYOffset = fieldHeight*2 + fieldYOffset*3*3/4;
     
     public static JTextField txtEmail;
 	public static JTextField txtPassword;
 	public static JTextField txtSecretQ;
 	public static JTextField txtSecret;
+	public static String questionString;
 	public static JButton btnRegging;
+	public static JButton btnForgotten;
 	public static JButton btnLogin;
+	public static JLabel label;
+	
+	
+	private TextPrompt promptEmail;
+	private TextPrompt promptAnswer;
+	private TextPrompt promptGetSecret;
 	
 	public static JFrame frame;
 	
@@ -40,41 +61,75 @@ public class WindowHandler {
     	if (frame == null) {
 			frame = new JFrame("GameQ");
 		}
-    	
+    	Color myWhite = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        Color myTransWhite = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+        Color myRed = new Color(0.905f, 0.298f, 0.235f, 1.0f);
+        Color myDarkGray = new Color(0.1333f, 0.1333f, 0.1333f, 1.0f);
+        Color cloudWhite = new Color(0.9255f, 0.9411f, 0.9450f, 1.0f);
     	
     	ActionListener loginListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Main.attemptLogin();
+            	if (Main.bolRegging) {
+            		Main.attemptRegister();
+            	} else if (Main.bolGettingQuestion) {
+            		Main.attemptGetQuestion();
+            	} else if (Main.bolAskingQuestion) {
+            		Main.attemptAnswerQuestion();
+            	} else {
+            		Main.attemptLogin();
+            	}
             }
         };
     	
-    	ActionListener registerListener = new ActionListener() {
+    	ActionListener forgotListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (Main.bolRegging) {
-                	if (txtSecret == null || txtSecretQ == null) {
-                		return;
-                	} else {
+                if (Main.bolRegging || Main.bolAskingQuestion || Main.bolGettingQuestion) {
+                	
                 		txtSecret.setVisible(false);
                 		txtSecretQ.setVisible(false);
-                		btnRegging.setBounds(frameWidth/2-(fieldWidth/2+middleXOffset)-buttonWidth/2, bonusFieldYOffset, buttonWidth, buttonHeight);
-                		btnLogin.setBounds(frameWidth/2 + middleXOffset +(fieldWidth/2 - buttonWidth/2), bonusFieldYOffset, buttonWidth, buttonHeight);
-                		btnRegging.setText("Join GameQ");
+                		btnRegging.setVisible(true);
+                		txtPassword.setVisible(true);
+                		btnForgotten.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusField2YOffset, buttonWidth, buttonHeight);
+                		btnLogin.setBounds(frameWidth/2-(fieldWidth+middleXOffset) + (fieldWidth-buttonWidth*2) + buttonWidth, bonusField2YOffset, buttonWidth, buttonHeight);
+                		btnForgotten.setText("Forgot?");
                 		btnLogin.setText("Sign In");
-                		
-                	}
+                		txtEmail.setText("");
+                		promptEmail.setPlaceholderString("Email");
+                		Main.bolAskingQuestion = false;
+                		Main.bolGettingQuestion = false;
+                		Main.bolRegging = false;
+                	
                 } else {
-                	if (txtSecret == null || txtSecretQ == null) {
-                		return;
-                	} else {
-                		txtSecret.setVisible(true);
-                		txtSecretQ.setVisible(true);
-                		btnRegging.setBounds(frameWidth/2-(fieldWidth/2+middleXOffset)-buttonWidth/2, buttonYOffset, buttonWidth, buttonHeight);
-                		btnLogin.setBounds(frameWidth/2 + middleXOffset +(fieldWidth/2 - buttonWidth/2), buttonYOffset, buttonWidth, buttonHeight);
-                		btnRegging.setText("Cancel");
-                		btnLogin.setText("Join Now");
-                	}
+                	
+                		txtSecret.setVisible(false);
+                		txtSecretQ.setVisible(false);
+                		txtPassword.setVisible(false);
+                		btnForgotten.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusFieldYOffset, buttonWidth, buttonHeight);
+                		btnLogin.setBounds(frameWidth/2-(fieldWidth+middleXOffset) + (fieldWidth-buttonWidth*2) + buttonWidth, bonusFieldYOffset, buttonWidth, buttonHeight);
+                		btnForgotten.setText("Cancel");
+                		btnLogin.setText("OK");
+                		promptEmail.setPlaceholderString("Email");
+                		Main.bolGettingQuestion = true;
+                		Main.bolAskingQuestion = false;
+                		Main.bolRegging = false;
+                	
                 }
-                Main.bolRegging = !Main.bolRegging;
+                
+            }
+        };
+        
+        ActionListener registerListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	txtSecret.setVisible(true);
+        		txtSecretQ.setVisible(true);
+        		btnRegging.setVisible(false);
+        		btnForgotten.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusField4YOffset, buttonWidth, buttonHeight);
+        		btnLogin.setBounds(frameWidth/2-(fieldWidth+middleXOffset) + (fieldWidth-buttonWidth*2) + buttonWidth, bonusField4YOffset, buttonWidth, buttonHeight);
+        		btnForgotten.setText("Cancel");
+        		btnLogin.setText("Sign Up");
+        		Main.bolGettingQuestion = false;
+        		Main.bolAskingQuestion = false;
+        		Main.bolRegging = true;
             }
         };
         
@@ -95,8 +150,12 @@ public class WindowHandler {
 		btnLogin.setText("Sign In");
 		btnLogin.addActionListener(loginListener);
 		
+		btnForgotten = new JButton();
+		btnForgotten.setText("Forgot?");
+		btnForgotten.addActionListener(forgotListener);
+		
 		btnRegging = new JButton();
-		btnRegging.setText("Join GameQ");
+		btnRegging.setText("Sign Up");
 		btnRegging.addActionListener(registerListener);
 		
 		txtEmail = new JTextField(30);
@@ -104,7 +163,7 @@ public class WindowHandler {
 		txtSecretQ = new JTextField(30);
 		txtSecret = new JTextField(30);
 		
-		TextPrompt promptEmail = new TextPrompt("Email", txtEmail);
+		promptEmail = new TextPrompt("Email", txtEmail);
 		promptEmail.changeAlpha(0.5f);
 		TextPrompt promptPassword = new TextPrompt("Password", txtPassword);
 		promptPassword.changeAlpha(0.5f);
@@ -118,6 +177,7 @@ public class WindowHandler {
 		frame.getContentPane().add(txtSecret);
 		frame.getContentPane().add(txtSecretQ);
 		frame.getContentPane().add(btnLogin);
+		frame.getContentPane().add(btnForgotten);
 		frame.getContentPane().add(btnRegging);
 		
 		KeyListener keyListen = new KeyListener() {
@@ -125,7 +185,16 @@ public class WindowHandler {
             public void keyPressed(KeyEvent e) { 
             	if (e.getKeyChar() == KeyEvent.VK_ENTER) {
             		System.out.println("pressed Enter");
-            		Main.attemptLogin();
+            		if (Main.bolRegging) {
+            			Main.attemptRegister();
+            		} else if (Main.bolGettingQuestion) {
+            			Main.attemptGetQuestion();
+            		} else if (Main.bolAskingQuestion) {
+            			Main.attemptAnswerQuestion();
+            		} else {
+            			Main.attemptLogin();
+            		}
+            		
             	}
             }
 
@@ -142,7 +211,8 @@ public class WindowHandler {
         frame.addKeyListener(keyListen);
         
         btnLogin.addKeyListener(keyListen);
-		btnRegging.addKeyListener(keyListen);
+        btnForgotten.addKeyListener(keyListen);
+        btnRegging.addKeyListener(keyListen);
 		txtSecretQ.addKeyListener(keyListen);
 		txtSecret.addKeyListener(keyListen);
 		txtEmail.addKeyListener(keyListen);
@@ -150,9 +220,31 @@ public class WindowHandler {
 		
 	
 		txtEmail.setBounds(frameWidth/2-(fieldWidth+middleXOffset), fieldYOffset, fieldWidth, fieldHeight);
-		txtPassword.setBounds(frameWidth/2+middleXOffset, fieldYOffset, fieldWidth, fieldHeight);
-		txtSecret.setBounds(frameWidth/2+middleXOffset, bonusFieldYOffset, fieldWidth, fieldHeight);
-		txtSecretQ.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusFieldYOffset, fieldWidth, fieldHeight);
+		txtPassword.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusFieldYOffset, fieldWidth, fieldHeight);
+		txtSecret.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusField2YOffset, fieldWidth, fieldHeight);
+		txtSecretQ.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusField3YOffset, fieldWidth, fieldHeight);
+		
+		
+		
+		try {
+			BufferedImage image;
+			image = ImageIO.read(Main.class.getResource("/res/256black.png"));
+			label = new JLabel(new ImageIcon(image));
+	        frame.getContentPane().add(label);
+	        label.setBounds((frameWidth/2 - imageSize)/2 + frameWidth/2  -middleXOffset/2, (frameHeight - imageSize)/2-middleXOffset*2, imageSize, imageSize);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		frame.getContentPane().setBackground(cloudWhite);
+		/*
+		btnForgotten.setBackground(myRed);
+		btnForgotten.setBorder(BorderFactory.createEmptyBorder());
+        btnForgotten.setFocusPainted(false);
+        */
+		
+		
     		
     }
     
@@ -165,8 +257,9 @@ public class WindowHandler {
     public void setupWindow() {
     	Main.bolRegging = false;
 		
-		btnRegging.setBounds(frameWidth/2-(fieldWidth/2+middleXOffset)-buttonWidth/2, bonusFieldYOffset, buttonWidth, buttonHeight);
-		btnLogin.setBounds(frameWidth/2 + middleXOffset +(fieldWidth/2 - buttonWidth/2), bonusFieldYOffset, buttonWidth, buttonHeight);
+    	btnForgotten.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusField2YOffset, buttonWidth, buttonHeight);
+		btnLogin.setBounds(frameWidth/2-(fieldWidth+middleXOffset) + (fieldWidth-buttonWidth*2) + buttonWidth, bonusField2YOffset, buttonWidth, buttonHeight);
+		btnRegging.setBounds(frameWidth/2-(fieldWidth+middleXOffset), frameHeight-buttonHeight*3, fieldWidth, buttonHeight);
 		
 		txtSecret.setVisible(false);
 		txtSecretQ.setVisible(false);

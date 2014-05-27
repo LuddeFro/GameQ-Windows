@@ -3,6 +3,7 @@ import java.util.Date;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapBpfProgram;
 import org.jnetpcap.PcapIf;
+import org.jnetpcap.packet.JFlowMap;
 import org.jnetpcap.packet.JHeader;
 import org.jnetpcap.packet.JHeaderPool;
 import org.jnetpcap.packet.JPacket;
@@ -17,7 +18,9 @@ public class PCapThread implements Runnable {
 	private StringBuilder errbuf;
 	private static final String filterString = "ip";
 	//private static final String filterString = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp src portrange 27015-27030 or udp dst port 27005";
-	
+	public static int honQPack;
+	public static int dotaQPack;
+	public static int dotaCPack;
 	
 	
 	public PCapThread(PcapIf device, StringBuilder errbuf) {
@@ -36,6 +39,8 @@ public class PCapThread implements Runnable {
         Pcap pcap =  
             Pcap.openLive(device.getName(), snaplen, flags, timeout, errbuf);  
   
+        
+        
         if (pcap == null) {  
             System.err.printf("Error while opening device for capture: "  
                 + errbuf.toString());  
@@ -58,30 +63,83 @@ public class PCapThread implements Runnable {
         PcapPacketHandler<String> handler = new PcapPacketHandler<String>() {  
         	  
             public void nextPacket(PcapPacket packet, String user) {  
+            	//System.out.println(packet.toString());
+            	String packetString = packet.toString();
             	
-            	/*if (packet.hasHeader(ip) == false){  
-                    return;  
-                }  
-                if (packet.hasHeader(tcp)== false) {  
-                    return;  
-                } */
+            	
+            	
+            	
+            	int i = packetString.indexOf("destination");
+            	int dstPort = 0;
+            	while(i >= 0) {
+            	     i = packetString.indexOf("destination", i+1);
+            	     String a = packetString.substring(i+14, i+19);
+            	     if (a.contains(".")) {
+            	    	 
+            	     } else {
+            	    	 a = a.replaceAll("[^0-9.]", "");
+            	    	 if (!a.isEmpty()) {
+            	    		 dstPort = Integer.parseInt(a);
+            	    	 }
+            	     }
+            	}
+            	System.out.println("DSTPORT: " + dstPort);
+            	
+            	i = packetString.indexOf("source");
+            	int srcPort = 0;
+            	while(i >= 0) {
+            	     i = packetString.indexOf("source", i+1);
+            	     String a = packetString.substring(i+9, i+14);
+            	     if (a.contains(".")) {
+            	    	 
+            	     } else {
+            	    	 a = a.replaceAll("[^0-9.]", "");
+            	    	 if (!a.isEmpty()) {
+            	    		 srcPort = Integer.parseInt(a);
+            	    	 }
+            	     }
+            	}
+            	System.out.println("SRCPORT: " + srcPort);
+            	
+            	
+            	
+            	
+            	
+            	
                 JHeader last = getStaticLastHeader(packet); // static method call  
                 System.out.printf("name=%s, descr=%s%n", last.getName(), last.getDescription());
                 //name === protocol
-                int i = 0;
-                int sPort = 0;
-                int dPort = 0;
+                
                 int len = packet.getCaptureHeader().wirelen();
                 String protocol = last.getName();
+                System.out.println(packet.getCaptureHeader());
                 
                 
-                
-                System.out.printf("Received packet at %s caplen=%-4d len=%-4d %s sPort="+sPort+" dPort="+dPort+" protocol:"+protocol+"\n",  
+                System.out.printf("Received packet at %s caplen=%-4d len=%-4d %s sPort="+srcPort+" dPort="+dstPort+" protocol:"+protocol+"\n",  
                     new Date(packet.getCaptureHeader().timestampInMillis()),   
                     packet.getCaptureHeader().caplen(),  // Length actually captured
                     packet.getCaptureHeader().wirelen(), // Original length 
                     user                                 // User supplied object  
                     );  
+                
+                
+                if (dstPort <= 11335 && dstPort >= 11235) {
+                    PCapThread.honQPack++;
+                }
+                
+                if (srcPort >= 27015 && srcPort <= 27020 && len <= 750 && len >= 600) {
+                    //checks wirelength 600-750
+                    
+                    PCapThread.dotaQPack++;
+                    
+                }
+                
+                if (dstPort == 27005) {
+                	PCapThread.dotaCPack++;
+                }
+                
+                
+                
             }  
         }; 
      

@@ -17,7 +17,7 @@ public class ConnectionHandler {
 	private boolean disconnected;
 	private final String USER_AGENT = "GQWindows/1.0";
 	private final String ServerURL = "http://185.2.155.172";
-
+	
 	
 
 	
@@ -77,6 +77,41 @@ public class ConnectionHandler {
 		post(urlParameters, urlPath);
 	}
 
+	public void postStatusUpdate(int game, int status, String token) {
+		String urlParameters = "game=" + game + "&status=" + status + "&token=" + token + "&device=windows";
+		String urlPath = "/softPush.php";
+		post(urlParameters,urlPath);
+	}
+	
+	public void postPush(int game, String token, String email) {
+		String urlParameters = "game=" + game + "&token=" + token + "&device=windows&email=" +email;
+		String urlPath = "/push.php";
+		post(urlParameters, urlPath);
+		//TODO local nots
+	}
+	
+	public void postGetSecret(String email) {
+		String urlParameters = "email=" + email;
+		String urlPath = "/getSecret.php";
+		post(urlParameters, urlPath);
+	}
+	
+	public void postCheckSecret(String email, String secret, String secretq) {
+		secret = Encryptor.hashSHA256(secret);
+		String urlParameters = "email=" + email + "&secret=" + secret + "&secretQ=" + secretq;
+		String urlPath = "/chkSecret.php";
+		post(urlParameters, urlPath);
+	}
+	
+	public void postTimeUpdate(String token) {
+		String urlParameters = "token=" + token + "&device=windows";
+		String urlPath = "/upTime.php";
+		post(urlParameters, urlPath);
+	}
+	
+	
+	
+	
 	private String post(String urlParameters, String urlPath) {
 
 		String url = ServerURL + urlPath;

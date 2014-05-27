@@ -66,6 +66,10 @@ public class TextPrompt extends JLabel
 		component.add( this );
 		checkForPrompt();
 	}
+	
+	public void setPlaceholderString(String string) {
+		setText( string );
+	}
 
 	/**
 	 *  Convenience method to change the alpha value of the current foreground
