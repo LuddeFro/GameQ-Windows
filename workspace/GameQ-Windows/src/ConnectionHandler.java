@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 public class ConnectionHandler {
 	private boolean disconnected;
 	private final String USER_AGENT = "GQWindows/1.0";
-	private final String ServerURL = "http://185.2.155.172";
+	private final String ServerURL = "http://185.2.155.172/GameQ_Server_Code";
 	
 	
 
@@ -51,7 +51,8 @@ public class ConnectionHandler {
 		if (email == null || password == null) {
 			return "@string/alt0";
 		}
-		Encryptor.hashSHA256(password);
+		System.out.println("pass" + password);
+		password = Encryptor.hashSHA256(password);
 		String urlParameters = "email=" + email + "&losenord=" + password;
 		String urlPath = "/signing.php";
 		return post(urlParameters, urlPath);
@@ -72,6 +73,7 @@ public class ConnectionHandler {
 
 	public void postRegister(String email, String firstname, String lastname, int gender, int yob, String country, String losenord, String secretq, String secret) {
 		losenord = Encryptor.hashSHA256(losenord);
+		secret = Encryptor.hashSHA256(secret);
 		String urlParameters = "email=" + email + "&firstname=" + firstname + "&lastname=" + lastname + "&gender=" + gender + "&yob=" + yob + "&country=" + country + "&losenord=" + losenord + "&secretq=" + secretq + "&secret=" + secret;
 		String urlPath = "/regging.php";
 		post(urlParameters, urlPath);
@@ -113,7 +115,7 @@ public class ConnectionHandler {
 	
 	
 	private String post(String urlParameters, String urlPath) {
-
+		Main.windowHandler.disableAll();
 		String url = ServerURL + urlPath;
 		URL obj = null;
 		String returnString = null;
@@ -143,10 +145,13 @@ public class ConnectionHandler {
 
 		if (returnString == null) {
 			System.out.println("URL Error (nullResponse) for " + url );
+			Main.windowHandler.enableAll();
 			return null;
 		} else {
+			Main.windowHandler.enableAll();
 			return handleResponse(returnString);
 		}
+		
 	}
 
 
@@ -255,10 +260,16 @@ public class ConnectionHandler {
 	        }
 	        return "@string/alt0";
 	    }
+	    if (response.equals("no logout")) {
+	    	Main.forceLogout();
+	    	return "@string/alt0";
+	    }
+	    
 	    // registration successful
 	    if (response.equals("signing up"))
 	    {
-	        alert("Welcome to GameQ, you should be able to log in immediatley with the password and username you provided");
+	        alert("Welcome to GameQ, a temporary password has been sent to the email address you provided. Use this password only for your first log in to activate your account!");
+	        Main.windowHandler.setupLogin();
 	        return "@string/alt1";
 	    }
 	    // user already exists, registration failed
@@ -267,6 +278,46 @@ public class ConnectionHandler {
 	    	alert("An account with that e-mail address already exists");
 	    	return "@string/alt0";
 	    }
+	    
+	  //secret question has been retrieved, response syntax "secQ%@", secretQuestion
+	    if (response.length() >= 4) {
+	    	if (response.substring(0, 4).equals("secQ")) {
+	    		Main.windowHandler.setupAnswer(response.substring(4));
+	    		return "@string/alt1";
+	    	}
+	    }
+	    	
+	    	
+	    if (response.equals("wronguser")) {
+	    	Main.alert("No such user exists");
+	    	WindowHandler.txtEmail.setText("");
+	    	return "@string/alt0";
+	    }
+	    
+	    if (response.equals("wrongsecret")) {
+	    	Main.alert("The answer you supplied is incorrect!");
+	    	WindowHandler.txtEmail.setText("");
+	    	return "@string/alt0";
+	    }
+	    
+	    if (response.equals("pwdreset")) {
+	    	Main.alert("Your password has successfully been reset! A new one has been sent to your e-mail. You should login and change this password as soon as possible.");
+	    	WindowHandler.txtEmail.setText("");
+	    	Main.windowHandler.setupLogin();
+	    	return "@string/alt1";
+	    }
+	    
+	    if (response.equals("mailerr")) {
+	    	Main.alert("An error has occured, try again shortly");
+	    	return "@string/altx";
+	    }
+	    
+	    if (response.equals("yes")) {
+	    	WindowHandler.txtEmail.setText("");
+	    	return "@string/alt1";
+	    }
+	    
+	    
 	    // session was broken / corrupted
 	    if (response.equals("badsession"))
 	    {

@@ -27,34 +27,37 @@ public class Main {
 	public static boolean bolRegging;
 	public static boolean bolGettingQuestion;
 	public static boolean bolAskingQuestion;
-	
+	public static PopupMenu popup;
 	public static TrayIcon trayIcon;
 	public static MenuItem logItem;
     public static MenuItem toggleItem;
+    public static MenuItem labelItem;
+    public static MenuItem quitItem;
     public static WindowHandler windowHandler;
     public static PacketHandler packetHandler;
+    public static TimeHandler timeHandler;
+    public static Encryptor enc;
+    private static boolean bolIsToggledOn;
     
     
     
 	public static void main(String args[]) {
+		enc = new Encryptor();
 		connectionsHandler = new ConnectionHandler();
+		timeHandler = new TimeHandler();
 		dataHandler = new DataModel();
+		windowHandler = new WindowHandler();
 		// setup agent program
 		trayIcon = null;
 		if (SystemTray.isSupported()) {
 			final SystemTray tray = SystemTray.getSystemTray();
-			Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/Qwhite.png")); 
+			Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/silverG.png")); 
 			
 			ActionListener logListener = new ActionListener() {
 	             public void actionPerformed(ActionEvent e) {
 	            	 System.out.println("pressed login/logout");
 	                 if (DataModel.getBolIsLoggedIn()) {
 	                	 connectionsHandler.postLogout();
-	                	 if (windowHandler == null) {
-	                		 windowHandler = new WindowHandler();
-	                	 }
-	                	 windowHandler.setupWindow();
-	                	 setDisconnected();
 	                 } else {
 	                	 if (windowHandler == null) {
 	                		 windowHandler = new WindowHandler();
@@ -115,11 +118,8 @@ public class Main {
 	         ActionListener quitListener = new ActionListener() {
 	             public void actionPerformed(ActionEvent e) {
 	            	 System.out.println("pressed quit");
-	            	 if (DataModel.getBolIsLoggedIn()) {
-	            		 connectionsHandler.postLogout();
-	            	 }
 	            	 try {
-						dataHandler.save();
+						DataModel.save();
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					} finally {
@@ -137,25 +137,29 @@ public class Main {
 	         };*/
 	         
 	         
-	         PopupMenu popup = new PopupMenu(); 
+	         popup = new PopupMenu(); 
 	         
 	         logItem = new MenuItem();
 	         toggleItem = new MenuItem();
-	         MenuItem quitItem = new MenuItem();
+	         quitItem = new MenuItem();
+	         labelItem = new MenuItem();
 	         
 	         logItem.addActionListener(logListener);
 	         toggleItem.addActionListener(toggleListener);
 	         quitItem.addActionListener(quitListener);
+	         
 	         
 	         toggleItem.setLabel("Resume queue monitoring");
 	         logItem.setLabel("Sign in / Sign up");
 	         quitItem.setLabel("Quit");
 	         
 	         toggleItem.setEnabled(false);
+	         labelItem.setEnabled(false);
 	         
 	         popup.add(toggleItem);
 	         popup.add(logItem);
 	         popup.add(quitItem);
+	         
 	         
 	         
 	         
@@ -175,7 +179,14 @@ public class Main {
 	         System.out.println("starting pCap");
 	         packetHandler = new PacketHandler();
 	         System.out.println("started pCap");
-	         
+	         System.out.println(DataModel.getEmail() + "<----<--<--<---<--");
+	         System.out.println(DataModel.getPassword() + "<----<--<--<---<--");
+	         System.out.println(DataModel.getBolIsLoggedIn() + "<----<--<--<---<--");
+	         if (DataModel.getBolIsLoggedIn() &&  !DataModel.getEmail().isEmpty() && !DataModel.getPassword().isEmpty()) {
+	        	 setAlreadyConnected();
+	         } else {
+	        	 setDisconnected();
+	         }
 	         System.out.println("main() end");
 		} else {
 			alert("Access was denied to the sytem tray or it doesn't exist! GameQ could not run correctly.");
@@ -191,7 +202,37 @@ public class Main {
 	 * toggles tracking on
 	 */
 	public static void setConnected() {
-		//TODO
+		System.out.println(WindowHandler.mLine1);
+		DataModel.setEmail(WindowHandler.mLine1);
+		System.out.println(WindowHandler.mLine2);
+		DataModel.setPassword(WindowHandler.mLine2);
+		DataModel.setBolIsLoggedIn(true);
+		//DataModel.setBolIsRegisteredForNotifications(true);
+		//DataModel.setToken(token);
+		toggleOn();
+		toggleItem.setEnabled(true);
+		logItem.setLabel("Logout");
+		labelItem.setLabel(DataModel.getEmail());
+		System.out.println(DataModel.getEmail() + "<-------------");
+		popup.insert(labelItem, 0);
+		connectionsHandler.postToken(DataModel.getToken(), DataModel.getEmail());
+		WindowHandler.frame.setVisible(false);
+		
+	}
+	/**
+	 * does the same as setConnected but skips setting the datasince it's already been done
+	* updates menu items
+	 * toggles tracking on
+	 */
+	public static void setAlreadyConnected() {
+		toggleOn();
+		toggleItem.setEnabled(true);
+		logItem.setLabel("Logout");
+		labelItem.setLabel(DataModel.getEmail());
+		System.out.println(DataModel.getEmail() + "<-------------");
+		popup.insert(labelItem, 0);
+		connectionsHandler.postToken(DataModel.getToken(), DataModel.getEmail());
+		
 	}
 	
 	/**
@@ -200,7 +241,15 @@ public class Main {
 	 * toggles tracking off
 	 */
 	public static void setDisconnected() {
-		//TODO
+		DataModel.setEmail("");
+		DataModel.setPassword("");
+		DataModel.setBolIsLoggedIn(false);
+		//DataModel.setBolIsRegisteredForNotifications(true);
+		//DataModel.setToken(token);
+		toggleOff();
+		toggleItem.setEnabled(false);
+		popup.remove(labelItem);
+		logItem.setLabel("Sign in / Sign up");
 	}
 	
 	/**
@@ -208,7 +257,7 @@ public class Main {
 	 * posts logout via connectionsHandler
 	 */
 	public static void logout() {
-		//TODO
+		connectionsHandler.postLogout();
 	}
 	
 	/**
@@ -224,46 +273,62 @@ public class Main {
 	 * attempts to login via connectionsHandler
 	 */
 	public static void attemptLogin() {
-		//TODO
+		System.out.println("pwddamnit: " + WindowHandler.mLine1);
+		connectionsHandler.postLogin(WindowHandler.mLine1, WindowHandler.mLine2);
 	}
 	/**
 	 * attempts to register via connectionsHandler
 	 */
 	public static void attemptRegister() {
-		//TODO
+		connectionsHandler.postRegister(WindowHandler.mLine1, "", "", 1, 0, "", WindowHandler.mLine2, WindowHandler.mLine3, WindowHandler.mLine4);
+		WindowHandler.questionEmail = WindowHandler.mLine1;
 	}
 	/**
 	 * attempts to get the secret question via connectionsHandler
 	 */
 	public static void attemptGetQuestion() {
-		//TODO
+		WindowHandler.questionEmail = WindowHandler.mLine1;
+		connectionsHandler.postGetSecret(WindowHandler.mLine1);
 	}
 	/**
 	 * attempts to validate secret via connectionsHandler
 	 */
 	public static void attemptAnswerQuestion() {
-		//TODO
+		connectionsHandler.postCheckSecret(WindowHandler.questionEmail, WindowHandler.mLine1, WindowHandler.question);
 	}
 	/**
 	 * toggles the pCap tracking on /off
 	 */
 	private static void toggle() {
-		//TODO
+		if (bolIsToggledOn) {
+			toggleOff();
+		} else {
+			toggleOn();
+		}
+		
 	}
 	/**
 	 * toggles the pCap tracking on
 	 */
 	private static void toggleOn() {
-		//TODO
+		bolIsToggledOn = true;
+		timeHandler.startQuickTimer();
+		Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/redG.png")); 
+		trayIcon.setImage(trayImage);
+		toggleItem.setLabel("Pause Monitoring");
 	}
 	/**
 	 * toggles the pCap tracking off
 	 */
 	private static void toggleOff() {
-		//TODO
+		bolIsToggledOn = false;
+		timeHandler.stopQuickTimer();
+		Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/silverG.png")); 
+		trayIcon.setImage(trayImage);
+		toggleItem.setLabel("Resume Monitoring");
 	}
 	
-	private static void alert(String message) {
+	public static void alert(String message) {
 		JFrame frame = new JFrame("GameQ - Alert");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		JOptionPane.showMessageDialog(frame, message);

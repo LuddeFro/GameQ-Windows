@@ -6,6 +6,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import org.apache.commons.io.FileUtils;
 
@@ -44,9 +48,43 @@ public class DataModel {
 		
 	}
 	
+	
 	public static String getToken() {
-		return token;
+		InetAddress ip;
+		try {
+	 
+			ip = InetAddress.getLocalHost();
+			System.out.println("Current IP address : " + ip.getHostAddress());
+	 
+			NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+	 
+			byte[] mac = network.getHardwareAddress();
+	 
+			System.out.print("Current MAC address : ");
+	 
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < mac.length; i++) {
+				sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));		
+			}
+			String macAd = sb.toString();
+			System.out.println(macAd);
+			return macAd;
+		} catch (UnknownHostException e) {
+	 
+			e.printStackTrace();
+			return "";
+	 
+		} catch (SocketException e){
+	 
+			e.printStackTrace();
+			return "";
+	 
+		}
 	}
+	
+	/*public static String getToken() {
+		return token;
+	}*/
 	public static String getEmail() {
 		return email;
 	}
@@ -62,25 +100,57 @@ public class DataModel {
 	
 	public static void setToken(String token) {
 		DataModel.token = token;
+		try {
+			save();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public static void setEmail(String email) {
 		DataModel.email = email;
+		try {
+			save();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public static void setPassword(String password) {
 		DataModel.password = password;
+		WindowHandler.mLine2 = "";
+		WindowHandler.txtPassword.setText("");
+		try {
+			save();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public static void setBolIsLoggedIn(boolean bolIsLoggedIn) {
 		DataModel.bolIsLoggedIn = bolIsLoggedIn;
+		try {
+			save();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public static void setBolIsRegisteredForNotifications(boolean bolIsRegisteredForNotifications) {
 		DataModel.bolIsRegisteredForNotifications = bolIsRegisteredForNotifications;
+		try {
+			save();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
 	
 		
 	
-	public void save() throws IOException {
+	public static void save() throws IOException {
 		File file = new File(filename);
 		if (file.exists() ) {
 		       file.delete();       
@@ -91,8 +161,9 @@ public class DataModel {
 			e.printStackTrace();
 			return;
 		} 
-		
-		byte[] bytes = Encryptor.encrypt("email="+email+"&password="+password+"&token="+token+"&bolIsLoggedIn="+bolIsLoggedIn+"&bolIsRegisteredForNotifications="+bolIsRegisteredForNotifications);
+		String a = "email="+email+"&password="+password+"&token="+token+"&bolIsLoggedIn="+bolIsLoggedIn+"&bolIsRegisteredForNotifications="+bolIsRegisteredForNotifications;
+		byte[] bytes = Encryptor.encrypt(a);
+		System.out.println("saving: " + a);
 		/*FileWriter fw;
 		try {
 			fw = new FileWriter(filename, true);
@@ -148,6 +219,7 @@ public class DataModel {
 		byte[] bytes = FileUtils.readFileToByteArray(file);
 		
 		String fullDecrypted = Encryptor.decrypt(bytes);
+		System.out.println("loading:" + fullDecrypted);
 		String[] splitString = fullDecrypted.split("&");
 		if (splitString.length != 5) {
 			System.out.println(splitString[0]);

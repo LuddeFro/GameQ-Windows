@@ -1,5 +1,6 @@
 
 import java.security.*;
+import java.util.Locale;
 
 import javax.crypto.*;
 import javax.crypto.spec.*;
@@ -8,9 +9,8 @@ public class Encryptor {
 
 	private static SecretKeySpec key;
 	private static Cipher aes;
-	private static boolean initiated = false;
 	
-	public static void encryptorInitiation() {
+	public Encryptor() {
 
 		String passphrase = "p2ona2sdfa3w9023rkadfz1";
 		MessageDigest digest;
@@ -41,10 +41,7 @@ public class Encryptor {
 	 * @return a hashed hex encoded version of the string, returns null in case of error.
 	 */
 	public static String hashSHA256(String password) {
-		if (!initiated) {
-			Encryptor.encryptorInitiation();
-			initiated = true;
-		}
+		System.out.println("password: " + password);
         try {
         	MessageDigest md = MessageDigest.getInstance("SHA-256");
 			md.update(password.getBytes());
@@ -60,7 +57,7 @@ public class Encryptor {
 	//TODO Make sense of this function
    private static String bytesToHex(byte[] b) {
       char hexDigit[] = {'0', '1', '2', '3', '4', '5', '6', '7',
-                         '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+                         '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
       StringBuffer buf = new StringBuffer();
       for (int j=0; j<b.length; j++) {
          buf.append(hexDigit[(b[j] >> 4) & 0x0f]);
@@ -70,10 +67,7 @@ public class Encryptor {
    }
 	
 	public static byte[] encrypt(String cleartext) {
-		if (!initiated) {
-			Encryptor.encryptorInitiation();
-			initiated = true;
-		}
+		
 		try {
 			Encryptor.aes.init(Cipher.ENCRYPT_MODE, key);
 		} catch (InvalidKeyException e) {
@@ -94,10 +88,7 @@ public class Encryptor {
 	}
 	
 	public static String decrypt(byte[] ciphertext) {
-		if (!initiated) {
-			Encryptor.encryptorInitiation();
-			initiated = true;
-		}
+		
 		try {
 			Encryptor.aes.init(Cipher.DECRYPT_MODE, key);
 		} catch (InvalidKeyException e) {

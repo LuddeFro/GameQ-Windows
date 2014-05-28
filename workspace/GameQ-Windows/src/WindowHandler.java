@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
@@ -41,19 +42,24 @@ public class WindowHandler {
     public static final int buttonYOffset = fieldHeight*2 + fieldYOffset*3*3/4;
     
     public static JTextField txtEmail;
-	public static JTextField txtPassword;
+	public static JPasswordField txtPassword;
 	public static JTextField txtSecretQ;
-	public static JTextField txtSecret;
-	public static String questionString;
+	public static JPasswordField txtSecret;
 	public static JButton btnRegging;
 	public static JButton btnForgotten;
 	public static JButton btnLogin;
 	public static JLabel label;
 	
+	public static String mLine1;
+	public static String mLine2;
+	public static String mLine3;
+	public static String mLine4;
+	
+	public static String question;
+	public static String questionEmail;
+	
 	
 	private TextPrompt promptEmail;
-	private TextPrompt promptAnswer;
-	private TextPrompt promptGetSecret;
 	
 	public static JFrame frame;
 	
@@ -69,6 +75,10 @@ public class WindowHandler {
     	
     	ActionListener loginListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+            	mLine1 = txtEmail.getText();
+        		mLine2 = new String(txtPassword.getPassword());
+        		mLine3 = txtSecretQ.getText();
+        		mLine4 = new String(txtSecret.getPassword());
             	if (Main.bolRegging) {
             		Main.attemptRegister();
             	} else if (Main.bolGettingQuestion) {
@@ -85,19 +95,7 @@ public class WindowHandler {
             public void actionPerformed(ActionEvent e) {
                 if (Main.bolRegging || Main.bolAskingQuestion || Main.bolGettingQuestion) {
                 	
-                		txtSecret.setVisible(false);
-                		txtSecretQ.setVisible(false);
-                		btnRegging.setVisible(true);
-                		txtPassword.setVisible(true);
-                		btnForgotten.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusField2YOffset, buttonWidth, buttonHeight);
-                		btnLogin.setBounds(frameWidth/2-(fieldWidth+middleXOffset) + (fieldWidth-buttonWidth*2) + buttonWidth, bonusField2YOffset, buttonWidth, buttonHeight);
-                		btnForgotten.setText("Forgot?");
-                		btnLogin.setText("Sign In");
-                		txtEmail.setText("");
-                		promptEmail.setPlaceholderString("Email");
-                		Main.bolAskingQuestion = false;
-                		Main.bolGettingQuestion = false;
-                		Main.bolRegging = false;
+                		setupLogin();
                 	
                 } else {
                 	
@@ -127,6 +125,7 @@ public class WindowHandler {
         		btnLogin.setBounds(frameWidth/2-(fieldWidth+middleXOffset) + (fieldWidth-buttonWidth*2) + buttonWidth, bonusField4YOffset, buttonWidth, buttonHeight);
         		btnForgotten.setText("Cancel");
         		btnLogin.setText("Sign Up");
+        		promptEmail.setPlaceholderString("Email");
         		Main.bolGettingQuestion = false;
         		Main.bolAskingQuestion = false;
         		Main.bolRegging = true;
@@ -136,7 +135,7 @@ public class WindowHandler {
         
 		
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/Qwhite.png")));
+        frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/redG.png")));
         frame.setResizable(false);
         frame.setSize(frameWidth, frameHeight);
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -159,9 +158,9 @@ public class WindowHandler {
 		btnRegging.addActionListener(registerListener);
 		
 		txtEmail = new JTextField(30);
-		txtPassword = new JTextField(30);
+		txtPassword = new JPasswordField(30);
 		txtSecretQ = new JTextField(30);
-		txtSecret = new JTextField(30);
+		txtSecret = new JPasswordField(30);
 		
 		promptEmail = new TextPrompt("Email", txtEmail);
 		promptEmail.changeAlpha(0.5f);
@@ -185,13 +184,21 @@ public class WindowHandler {
             public void keyPressed(KeyEvent e) { 
             	if (e.getKeyChar() == KeyEvent.VK_ENTER) {
             		System.out.println("pressed Enter");
+            		mLine1 = txtEmail.getText();
+            		mLine2 = new String(txtPassword.getPassword());
+            		mLine3 = txtSecretQ.getText();
+            		mLine4 = new String(txtSecret.getPassword());
             		if (Main.bolRegging) {
+            			System.out.println("regging ");
             			Main.attemptRegister();
             		} else if (Main.bolGettingQuestion) {
+            			System.out.println("getting");
             			Main.attemptGetQuestion();
             		} else if (Main.bolAskingQuestion) {
+            			System.out.println("checking");
             			Main.attemptAnswerQuestion();
             		} else {
+            			System.out.println("signing");
             			Main.attemptLogin();
             		}
             		
@@ -221,8 +228,12 @@ public class WindowHandler {
 	
 		txtEmail.setBounds(frameWidth/2-(fieldWidth+middleXOffset), fieldYOffset, fieldWidth, fieldHeight);
 		txtPassword.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusFieldYOffset, fieldWidth, fieldHeight);
-		txtSecret.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusField2YOffset, fieldWidth, fieldHeight);
-		txtSecretQ.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusField3YOffset, fieldWidth, fieldHeight);
+		txtSecretQ.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusField2YOffset, fieldWidth, fieldHeight);
+		txtSecret.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusField3YOffset, fieldWidth, fieldHeight);
+		
+		btnLogin.setFocusPainted(false);
+		btnRegging.setFocusPainted(false);
+		btnForgotten.setFocusPainted(false);
 		
 		
 		
@@ -248,11 +259,63 @@ public class WindowHandler {
     		
     }
     
+    public void setupAnswer(String question) {
+    	this.question = question;
+    	txtSecret.setVisible(false);
+		txtSecretQ.setVisible(false);
+		btnRegging.setVisible(true);
+		txtPassword.setVisible(false);
+		btnForgotten.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusFieldYOffset, buttonWidth, buttonHeight);
+		btnLogin.setBounds(frameWidth/2-(fieldWidth+middleXOffset) + (fieldWidth-buttonWidth*2) + buttonWidth, bonusFieldYOffset, buttonWidth, buttonHeight);
+		btnForgotten.setText("Cancel");
+		btnLogin.setText("Answer");
+		promptEmail.setPlaceholderString(question);
+		Main.bolGettingQuestion = false;
+		Main.bolAskingQuestion = true;
+		Main.bolRegging = false;
+		txtEmail.setText("");
+    }
     
     
+    public void setupLogin() {
+    	txtSecret.setVisible(false);
+		txtSecretQ.setVisible(false);
+		btnRegging.setVisible(true);
+		txtPassword.setVisible(true);
+		btnForgotten.setBounds(frameWidth/2-(fieldWidth+middleXOffset), bonusField2YOffset, buttonWidth, buttonHeight);
+		btnLogin.setBounds(frameWidth/2-(fieldWidth+middleXOffset) + (fieldWidth-buttonWidth*2) + buttonWidth, bonusField2YOffset, buttonWidth, buttonHeight);
+		btnForgotten.setText("Forgot?");
+		btnLogin.setText("Sign In");
+		txtEmail.setText("");
+		promptEmail.setPlaceholderString("Email");
+		Main.bolAskingQuestion = false;
+		Main.bolGettingQuestion = false;
+		Main.bolRegging = false;
+		txtSecretQ.setText("");
+		txtSecret.setText("");
+		txtPassword.setText("");
+		txtEmail.setText(questionEmail);
+    }
     
+    public void disableAll() {
+    	txtEmail.setEnabled(false);
+    	txtPassword.setEnabled(false);
+    	txtSecret.setEnabled(false);
+    	txtSecretQ.setEnabled(false);
+    	btnRegging.setEnabled(false);
+    	btnLogin.setEnabled(false);
+    	btnForgotten.setEnabled(false);
+    }
     
-    
+    public void enableAll() {
+    	txtEmail.setEnabled(true);
+    	txtPassword.setEnabled(true);
+    	txtSecret.setEnabled(true);
+    	txtSecretQ.setEnabled(true);
+    	btnRegging.setEnabled(true);
+    	btnLogin.setEnabled(true);
+    	btnForgotten.setEnabled(true);
+    }
     
     public void setupWindow() {
     	Main.bolRegging = false;

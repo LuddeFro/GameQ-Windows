@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.Timer;
 
@@ -11,8 +14,10 @@ import javax.swing.Timer;
 public class TimeHandler {
 	public Timer quickTimer;
 	public Timer dotaCDTimer;
+	public Timer timeTimer;
 	private static final int quickSpeedMillis = 1000;
 	private static final int dotaCDMillis = 5000;
+	private static final int timeSpeedMillis = 60000;
 	private Buffer dotaQBuffer;
 	private Buffer dotaCBuffer;
 	private Buffer honQBuffer;
@@ -65,8 +70,29 @@ public class TimeHandler {
 		
 	}
 	
+	public void startTimeTimer() {
+		TimeTimerHandler handler = new TimeTimerHandler();
+		if (timeTimer != null) {
+			if (timeTimer.isRunning()) {
+				timeTimer.restart();
+				return;
+			} 
+		} 
+		
+		timeTimer = new Timer(timeSpeedMillis, handler);
+		timeTimer.start();
+	}
+	
+	public void stopTimeTimer() {
+		timeTimer.stop();
+	}
+	
 	public void startQuickTimer() {
 		QuickTimerHandler handler = new QuickTimerHandler();
+		PCapThread.dotaCPack = 0;
+		PCapThread.dotaQPack = 0;
+		PCapThread.honQPack = 0;
+		bolFirstTick = true;
 		if (quickTimer != null) {
 			if (quickTimer.isRunning()) {
 				quickTimer.restart();
@@ -79,7 +105,9 @@ public class TimeHandler {
 	}
 	
 	public void stopQuickTimer() {
-		quickTimer.stop();
+		if (quickTimer != null) {
+			quickTimer.stop();
+		}
 	}
 	
 	public class QuickTimerHandler implements ActionListener{
@@ -90,6 +118,7 @@ public class TimeHandler {
 
 			System.out.println("tick");
 		    // get processes
+			/*
 			StringBuilder processesBuilder = new StringBuilder();
 			 try {
 		            String process;
@@ -108,28 +137,44 @@ public class TimeHandler {
 		     }
 		    
 		    String processes = processesBuilder.toString();
-		    
+		    */
+			List<String> processes = listRunningProcesses();
+		      String result = "";
+
+		      // display the result 
+		      Iterator<String> it = processes.iterator();
+		      int i = 0;
+		      while (it.hasNext()) {
+		         result += it.next() +",";
+		         i++;
+		         if (i==10) {
+		             result += "\n";
+		             i = 0;
+		         }
+		      }
+		      //----
+		      System.out.println(result);
 		    System.out.println("<<<processes checked>>>");
 		    
 		    //-------------------check processes------------------
 		    boolean honRunning = false;
 		    boolean dotaRunning = false;
 		    boolean csgoRunning = false;
-		    if (!processes.contains("Heroes") || !processes.contains("Newerth")) {
+		    if (!result.contains("Heroes") || !result.contains("Newerth")) {
 		        honRunning = false;
 		        //NSLog(@"hon not running, false alarm");
 		    } else {
 		        honRunning = true;
 		        //NSLog(@"hon running, probably true alarm");
 		    }
-		    if (!processes.contains("dota")) {
+		    if (!result.contains("dota")) {
 		        dotaRunning = false;
 		        //NSLog(@"dota not running, false alarm");
 		    } else {
 		        dotaRunning = true;
 		        //NSLog(@"dota running, probably true alarm");
 		    }
-		    if (!processes.contains("csgo")) {
+		    if (!result.contains("csgo")) {
 		        csgoRunning = false;
 		        //NSLog(@"csgo not running, false alarm");
 		    } else {
@@ -210,6 +255,17 @@ public class TimeHandler {
 		
 	}
 	
+	public class TimeTimerHandler implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			connectionsHandler.postTimeUpdate(DataModel.getToken());
+			
+		}
+		
+	}
+	
 	
 	public void offline(int game) {
 		boolean bolOnline = onlineArray[game];
@@ -264,6 +320,29 @@ public class TimeHandler {
 		onlineArray[game] = true;
 		triggerDotaCD();
 	}
+	
+	public static List<String> listRunningProcesses() {
+	    List<String> processes = new ArrayList<String>();
+	    try {
+	      String line;
+	      Process p = Runtime.getRuntime().exec("tasklist.exe /fo csv /nh");
+	      BufferedReader input = new BufferedReader
+	          (new InputStreamReader(p.getInputStream()));
+	      while ((line = input.readLine()) != null) {
+	          if (!line.trim().equals("")) {
+	              // keep only the process name
+	              line = line.substring(1);
+	              processes.add(line.substring(0, line.indexOf("")));
+	          }
+
+	      }
+	      input.close();
+	    }
+	    catch (Exception err) {
+	      err.printStackTrace();
+	    }
+	    return processes;
+	  }
 		
 		
 }

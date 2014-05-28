@@ -16,8 +16,8 @@ public class PCapThread implements Runnable {
 
 	private PcapIf device;
 	private StringBuilder errbuf;
-	private static final String filterString = "ip";
-	//private static final String filterString = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp src portrange 27015-27030 or udp dst port 27005";
+	//private static final String filterString = "ip";
+	private static final String filterString = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp src portrange 27015-27030 or udp dst port 27005";
 	public static int honQPack;
 	public static int dotaQPack;
 	public static int dotaCPack;
