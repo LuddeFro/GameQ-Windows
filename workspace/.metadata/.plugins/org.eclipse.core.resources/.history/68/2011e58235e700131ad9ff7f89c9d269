@@ -117,7 +117,27 @@ public class TimeHandler {
 
 
 			System.out.println("tick");
+		    // get processes
+			/*
+			StringBuilder processesBuilder = new StringBuilder();
+			 try {
+		            String process;
+		            // getRuntime: Returns the runtime object associated with the current Java application.
+		            // exec: Executes the specified string command in a separate process.
+		            Process p = Runtime.getRuntime().exec("ps -few");
+		            BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		            while ((process = input.readLine()) != null) {
+		                System.out.println(process);// <-- Print all Process here line
+                        								// by line
+		                processesBuilder.append(process); 
+		            }
+		            input.close();
+			 } catch (Exception err) {
+		            err.printStackTrace();
+		     }
 		    
+		    String processes = processesBuilder.toString();
+		    */
 			List<String> processes = listRunningProcesses();
 		      String result = "";
 
@@ -140,21 +160,21 @@ public class TimeHandler {
 		    boolean honRunning = false;
 		    boolean dotaRunning = false;
 		    boolean csgoRunning = false;
-		    if (!result.contains("hon.exe")) {
+		    if (!result.contains("Heroes") || !result.contains("Newerth")) {
 		        honRunning = false;
 		        //NSLog(@"hon not running, false alarm");
 		    } else {
 		        honRunning = true;
 		        //NSLog(@"hon running, probably true alarm");
 		    }
-		    if (!result.contains("dota.exe")) {
+		    if (!result.contains("dota")) {
 		        dotaRunning = false;
 		        //NSLog(@"dota not running, false alarm");
 		    } else {
 		        dotaRunning = true;
 		        //NSLog(@"dota running, probably true alarm");
 		    }
-		    if (!result.contains("csgo.exe")) {
+		    if (!result.contains("csgo")) {
 		        csgoRunning = false;
 		        //NSLog(@"csgo not running, false alarm");
 		    } else {
@@ -311,7 +331,8 @@ public class TimeHandler {
 	      while ((line = input.readLine()) != null) {
 	          if (!line.trim().equals("")) {
 	              // keep only the process name
-	              processes.add(line);
+	              line = line.substring(1);
+	              processes.add(line.substring(0, line.indexOf("")));
 	          }
 
 	      }
