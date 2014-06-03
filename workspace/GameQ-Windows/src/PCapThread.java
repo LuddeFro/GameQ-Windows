@@ -21,6 +21,11 @@ public class PCapThread implements Runnable {
 	public static int honQPack;
 	public static int dotaQPack;
 	public static int dotaCPack;
+	public static int dota206Pack;
+	public static int dota190Pack;
+	public static int dota174Pack;
+	public static int csgoGamePack;
+	public static int csgoQPack;
 	
 	
 	public PCapThread(PcapIf device, StringBuilder errbuf) {
@@ -136,6 +141,45 @@ public class PCapThread implements Runnable {
                 
                 if (dstPort == 27005) {
                 	PCapThread.dotaCPack++;
+                }
+                
+                if (srcPort >= 27015 && srcPort <= 27020 && len == 174) {
+                   
+                    
+                    PCapThread.dota174Pack++;
+                    
+                }
+                
+                if (srcPort >= 27015 && srcPort <= 27020 && len == 190) {
+                    
+                    if (PCapThread.dota174Pack > 0 || Main.timeHandler.dota174Buffer.bufferValue() > 0) {
+                    	PCapThread.dota190Pack++;
+                    	
+                    }
+                    
+                }
+                
+                if (srcPort >= 27015 && srcPort <= 27020 && len == 206) {
+                   
+                    if ((PCapThread.dota174Pack > 0 || Main.timeHandler.dota174Buffer.bufferValue() > 0) && (PCapThread.dota190Pack > 0 || Main.timeHandler.dota190Buffer.bufferValue() > 0)) {
+                        PCapThread.dota206Pack++;
+                    	
+                    }
+                    
+                }
+                
+                if (srcPort >= 27015 && srcPort <= 27020 && dstPort == 27005 && len == 60) {
+                    
+                    
+                    PCapThread.csgoQPack++;
+                    
+                }
+                
+                if (srcPort >= 27015 && srcPort <= 27020 && dstPort == 27005 && len >= 100 && len <= 1200) {
+                    
+                    
+                    PCapThread.csgoGamePack++;
+                    
                 }
                 
                 

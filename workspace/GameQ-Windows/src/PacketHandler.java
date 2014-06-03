@@ -18,17 +18,18 @@ public class PacketHandler {
 		
 		List<PcapIf> alldevs = new ArrayList<PcapIf>(); // Will be filled with NICs 
 		StringBuilder errbuf = new StringBuilder(); // For any error msgs 
-		
 		//list devices on the system
-		int r = Pcap.findAllDevs(alldevs, errbuf);  
-        if (r == Pcap.NOT_OK || alldevs.isEmpty()) {  
+		int r = Pcap.findAllDevs(alldevs, errbuf); 
+		Main.alert("it works!");
+		
+        if (r == Pcap.NOT_OK || alldevs.isEmpty()) { 
+        	
             System.err.printf("Can't read list of devices, error is %s", errbuf  
                 .toString());  
+            
             return;  
         }  
-		
         System.out.println("Network devices found:");  
-        
         int i = 0;  
         for (PcapIf device : alldevs) {  
             String description =  

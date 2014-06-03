@@ -29,7 +29,7 @@ public class ConnectionHandler {
 	}
 
 	public void postLogout() {
-		String token = Main.dataHandler.getToken();
+		String token = DataModel.getToken();
 		if (token == null) {
 			return;
 		}
@@ -61,7 +61,8 @@ public class ConnectionHandler {
 	public void postToken(String token, String email) {
 		
 		
-		String deviceName = System.getProperty("user.name") + "'s " + System.getProperty("os.arch") + " Computer";
+		String deviceName = DataModel.getDeviceName();
+		
 		
 		if (deviceName == null || email == null || token == null) {
 			return;
@@ -111,6 +112,38 @@ public class ConnectionHandler {
 		post(urlParameters, urlPath);
 	}
 	
+	
+	
+	
+	
+	public void postChkVersion() {
+		String urlParameters = "device=windows";
+		String urlPath = "/versionControl.php";
+		post(urlParameters, urlPath);
+	    
+	}
+	
+	public void postNewSecret(String secretq, String secret, String email, String losenord) {
+		secret = Encryptor.hashSHA256(secret);
+		losenord = Encryptor.hashSHA256(losenord);
+		String urlParameters = "secretq=" + secretq + "&secret=" + secret + "&email=" + email + "&losenord=" + losenord;
+		String urlPath = "/updateSecret.php";
+		post(urlParameters, urlPath);
+	}
+	
+	public void postNewPass(String newLosenord, String email, String oldLosenord) {
+		newLosenord = Encryptor.hashSHA256(newLosenord);
+		oldLosenord = Encryptor.hashSHA256(oldLosenord);
+		String urlParameters = "newLosenord=" + newLosenord + "&email=" + email + "&losenord=" + oldLosenord;
+		String urlPath = "/updatePassword.php";
+		post(urlParameters, urlPath);
+	}
+	
+	public void postNewDeviceName(String deviceName, String token, String email) {
+		String urlParameters = "deviceName=" + deviceName + "&token=" + token + "&email=" + email;
+		String urlPath = "/updateDeviceName.php";
+		post(urlParameters, urlPath);
+	}
 	
 	
 	
@@ -225,6 +258,18 @@ public class ConnectionHandler {
 	            return backToString;
 	        }
 	    }  
+		
+		if (response.length() >= 7) {
+			if (response.substring(0, 7).equals("version")) {
+	            response = response.substring(7);
+	            if (response.equals("1.0")) {
+	            	return "@string/alt1";
+	            } else {
+	            	Main.alert("A new version of GameQ is available at GameQ.io");
+	    	        return "@string/alt0";
+	            }
+	        }
+	    }
 
 		if (response.equals("postedDevice")) {
 	        return "@string/alt1";
@@ -245,15 +290,15 @@ public class ConnectionHandler {
 	    }
 
 	  //if you just logged out
-	    if (response.equals("logged out"))
+	    if (response.equals("loggedOut"))
 	    {
 	        if (!disconnected)
 	        {
 	            //if you logged out manually
 	            Main.setDisconnected();
+	            
 	            return "@string/alt1";
-	        }
-	        else {
+	        } else {
 	            //if you got "badsession" or "no" (an alert has already been sent)
 	            disconnected = false;
 	            Main.forceLogout();
@@ -268,7 +313,8 @@ public class ConnectionHandler {
 	    // registration successful
 	    if (response.equals("signing up"))
 	    {
-	        alert("Welcome to GameQ, a temporary password has been sent to the email address you provided. Use this password only for your first log in to activate your account!");
+	        alert("Welcome to GameQ, a temporary password has been sent to the email address you provided. "
+	        		+ "Use this password only for your first log in to activate your account!");
 	        Main.windowHandler.setupLogin();
 	        return "@string/alt1";
 	    }
@@ -294,6 +340,36 @@ public class ConnectionHandler {
 	    	return "@string/alt0";
 	    }
 	    
+	    if (response.equals("wrongPassword")) {
+	    	Main.alert("The password you specified was incorrect!");
+	    	WindowHandler.txt1Secure.setText("");
+	    	return "@string/alt0";
+	    }
+	    
+	    if (response.equals("newName")) {
+	    	Main.alert("Your device name was successfully updated!");
+	    	WindowHandler.txtEmail.setText("");
+	    	Main.windowHandler.setupSettings();
+	    	return "@string/alt0";
+	    }
+	    
+	    if (response.equals("newPass")) {
+	    	Main.alert("Your password was succussfully updated!");
+	    	WindowHandler.txt1Secure.setText("");
+	    	WindowHandler.txtPassword.setText("");
+	    	Main.windowHandler.setupSettings();
+	    	return "@string/alt0";
+	    }
+	    
+	    if (response.equals("newSecret")) {
+	    	Main.alert("Your secret was successfully updated!");
+	    	WindowHandler.txt1Secure.setText("");
+	    	WindowHandler.txt2Insecure.setText("");
+	    	WindowHandler.txt3Secure.setText("");
+	    	Main.windowHandler.setupSettings();
+	    	return "@string/alt0";
+	    }
+	    
 	    if (response.equals("wrongsecret")) {
 	    	Main.alert("The answer you supplied is incorrect!");
 	    	WindowHandler.txtEmail.setText("");
@@ -301,7 +377,8 @@ public class ConnectionHandler {
 	    }
 	    
 	    if (response.equals("pwdreset")) {
-	    	Main.alert("Your password has successfully been reset! A new one has been sent to your e-mail. You should login and change this password as soon as possible.");
+	    	Main.alert("Your password has successfully been reset! A new one has been sent to your e-mail. "
+	    			+ "You should login and change this password as soon as possible.");
 	    	WindowHandler.txtEmail.setText("");
 	    	Main.windowHandler.setupLogin();
 	    	return "@string/alt1";

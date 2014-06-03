@@ -19,6 +19,7 @@ public class DataModel {
 	private static String token;
 	private static String email;
 	private static String password;
+	private static String deviceName;
 	private static boolean bolIsLoggedIn;
 	private static boolean bolIsRegisteredForNotifications;
 	
@@ -26,6 +27,7 @@ public class DataModel {
 		token = "";
 		email = "";
 		password = "";
+		deviceName = "";
 		bolIsLoggedIn = false;
 		bolIsRegisteredForNotifications = false;
 		
@@ -35,6 +37,7 @@ public class DataModel {
 		//filename = "C:/Users/Ludvig Fröberg/Desktop/workspace/GameQ-Windows/bin/res/stg.cdtx";
 		
 		filename = System.getProperty("user.dir") + "\\bin\\res\\stg.cdtx";
+		// filename = "C:\\Program Files\\GameQ\\stg.cdtx";
 		System.out.println(filename);
 		try {
 			load();
@@ -88,6 +91,14 @@ public class DataModel {
 	public static String getEmail() {
 		return email;
 	}
+	
+	public static String getDeviceName() {
+		if (deviceName.isEmpty()) {
+			return System.getProperty("user.name") + "'s " + System.getProperty("os.arch") + " Computer";
+		} else {
+			return deviceName;
+		}
+	}
 	public static String getPassword() {
 		return password;
 	}
@@ -120,6 +131,15 @@ public class DataModel {
 		DataModel.password = password;
 		WindowHandler.mLine2 = "";
 		WindowHandler.txtPassword.setText("");
+		try {
+			save();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public static void setDeviceName(String deviceName) {
+		DataModel.deviceName = deviceName;
 		try {
 			save();
 		} catch (IOException e) {
@@ -161,7 +181,7 @@ public class DataModel {
 			e.printStackTrace();
 			return;
 		} 
-		String a = "email="+email+"&password="+password+"&token="+token+"&bolIsLoggedIn="+bolIsLoggedIn+"&bolIsRegisteredForNotifications="+bolIsRegisteredForNotifications;
+		String a = "email="+email+"&password="+password+"&token="+token+"&bolIsLoggedIn="+bolIsLoggedIn+"&bolIsRegisteredForNotifications="+bolIsRegisteredForNotifications+"&deviceName="+deviceName;
 		byte[] bytes = Encryptor.encrypt(a);
 		System.out.println("saving: " + a);
 		/*FileWriter fw;
@@ -221,12 +241,12 @@ public class DataModel {
 		String fullDecrypted = Encryptor.decrypt(bytes);
 		System.out.println("loading:" + fullDecrypted);
 		String[] splitString = fullDecrypted.split("&");
-		if (splitString.length != 5) {
+		if (splitString.length != 6) {
 			System.out.println(splitString[0]);
 			System.out.println(splitString.length);
 			return;
 		}
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 6; i++) {
 			System.out.println(splitString[i]);
 			String a = splitString[i];
 			String[] b = a.split("=");
@@ -245,6 +265,7 @@ public class DataModel {
 		token = splitString[2];
 		bolIsLoggedIn = Boolean.parseBoolean(splitString[3]);
 		bolIsRegisteredForNotifications = Boolean.parseBoolean(splitString[4]);
+		deviceName = splitString[5];
 	}
 	
 	public static void copy(InputStream input,

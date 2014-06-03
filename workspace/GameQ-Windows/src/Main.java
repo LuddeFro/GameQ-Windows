@@ -27,21 +27,38 @@ public class Main {
 	public static boolean bolRegging;
 	public static boolean bolGettingQuestion;
 	public static boolean bolAskingQuestion;
+	public static boolean bolSettingPass;
+	public static boolean bolSettingSecret;
+	public static boolean bolSettingDeviceName;
 	public static PopupMenu popup;
 	public static TrayIcon trayIcon;
 	public static MenuItem logItem;
     public static MenuItem toggleItem;
     public static MenuItem labelItem;
     public static MenuItem quitItem;
+    public static MenuItem statusItem;
+    public static MenuItem settingsItem;
     public static WindowHandler windowHandler;
     public static PacketHandler packetHandler;
     public static TimeHandler timeHandler;
     public static Encryptor enc;
     private static boolean bolIsToggledOn;
+    public static String res;
     
     
     
 	public static void main(String args[]) {
+		if (isRetina()) {
+			res = "/res2x/";
+		} else {
+			res = "/res/";
+		}
+		bolRegging = false;
+		bolGettingQuestion = false;
+		bolAskingQuestion = false;
+		bolSettingPass = false;
+		bolSettingSecret = false;
+		bolSettingDeviceName = false;
 		enc = new Encryptor();
 		connectionsHandler = new ConnectionHandler();
 		timeHandler = new TimeHandler();
@@ -49,9 +66,10 @@ public class Main {
 		windowHandler = new WindowHandler();
 		// setup agent program
 		trayIcon = null;
+		
 		if (SystemTray.isSupported()) {
 			final SystemTray tray = SystemTray.getSystemTray();
-			Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/silverG.png")); 
+			Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource(res + "silverG.png")); 
 			
 			ActionListener logListener = new ActionListener() {
 	             public void actionPerformed(ActionEvent e) {
@@ -113,6 +131,7 @@ public class Main {
 				public void mouseReleased(MouseEvent e) {
 					//required inherited method
 				}
+
 	         };
 	         
 	         ActionListener quitListener = new ActionListener() {
@@ -129,6 +148,13 @@ public class Main {
 	             }
 	         };	 
 	         
+	         ActionListener settingsListener = new ActionListener() {
+	             public void actionPerformed(ActionEvent e) {
+	            	 System.out.println("pressed settings");
+	            	windowHandler.setupSettings();
+	             }
+	         };
+	         
 	         /*
 	         ActionListener listener = new ActionListener() {
 	             public void actionPerformed(ActionEvent e) {
@@ -143,25 +169,33 @@ public class Main {
 	         toggleItem = new MenuItem();
 	         quitItem = new MenuItem();
 	         labelItem = new MenuItem();
+	         statusItem = new MenuItem();
+	         settingsItem = new MenuItem();
 	         
 	         logItem.addActionListener(logListener);
 	         toggleItem.addActionListener(toggleListener);
 	         quitItem.addActionListener(quitListener);
+	         settingsItem.addActionListener(settingsListener);
+	         
 	         
 	         
 	         toggleItem.setLabel("Resume queue monitoring");
 	         logItem.setLabel("Sign in / Sign up");
 	         quitItem.setLabel("Quit");
+	         statusItem.setLabel("Status: Offline");
+	         settingsItem.setLabel("Settings...");
 	         
 	         toggleItem.setEnabled(false);
 	         labelItem.setEnabled(false);
+	         statusItem.setEnabled(false);
 	         
-	         popup.add(toggleItem);
+	         popup.add(statusItem);
 	         popup.add(logItem);
 	         popup.add(quitItem);
 	         
 	         
 	         
+	         connectionsHandler.postChkVersion();
 	         
 	         
 	         // construct a TrayIcon
@@ -170,6 +204,7 @@ public class Main {
 	         trayIcon.addMouseListener(iconListener);
 	         // ...
 	         // add the tray image
+	         
 	         try {
 	             tray.add(trayIcon);
 	         } catch (AWTException e) {
@@ -179,9 +214,14 @@ public class Main {
 	         System.out.println("starting pCap");
 	         packetHandler = new PacketHandler();
 	         System.out.println("started pCap");
+	         
 	         System.out.println(DataModel.getEmail() + "<----<--<--<---<--");
+	         
 	         System.out.println(DataModel.getPassword() + "<----<--<--<---<--");
+	         
 	         System.out.println(DataModel.getBolIsLoggedIn() + "<----<--<--<---<--");
+	         
+	         
 	         if (DataModel.getBolIsLoggedIn() &&  !DataModel.getEmail().isEmpty() && !DataModel.getPassword().isEmpty()) {
 	        	 setAlreadyConnected();
 	         } else {
@@ -211,10 +251,12 @@ public class Main {
 		//DataModel.setToken(token);
 		toggleOn();
 		toggleItem.setEnabled(true);
-		logItem.setLabel("Logout");
+		logItem.setLabel("Change user");
 		labelItem.setLabel(DataModel.getEmail());
 		System.out.println(DataModel.getEmail() + "<-------------");
+		popup.insert(toggleItem, 1);
 		popup.insert(labelItem, 0);
+		popup.insert(settingsItem, 3);
 		connectionsHandler.postToken(DataModel.getToken(), DataModel.getEmail());
 		WindowHandler.frame.setVisible(false);
 		
@@ -227,11 +269,14 @@ public class Main {
 	public static void setAlreadyConnected() {
 		toggleOn();
 		toggleItem.setEnabled(true);
-		logItem.setLabel("Logout");
+		logItem.setLabel("Change user");
 		labelItem.setLabel(DataModel.getEmail());
 		System.out.println(DataModel.getEmail() + "<-------------");
+		popup.insert(toggleItem, 1);
 		popup.insert(labelItem, 0);
+		popup.insert(settingsItem, 3);
 		connectionsHandler.postToken(DataModel.getToken(), DataModel.getEmail());
+		WindowHandler.frame.setVisible(false);
 		
 	}
 	
@@ -241,14 +286,18 @@ public class Main {
 	 * toggles tracking off
 	 */
 	public static void setDisconnected() {
+		System.out.println("setting dsiconnected");
 		DataModel.setEmail("");
 		DataModel.setPassword("");
 		DataModel.setBolIsLoggedIn(false);
-		//DataModel.setBolIsRegisteredForNotifications(true);
-		//DataModel.setToken(token);
+
+
 		toggleOff();
+		statusItem.setLabel("Status: Offline");
 		toggleItem.setEnabled(false);
 		popup.remove(labelItem);
+		popup.remove(toggleItem);
+		popup.remove(settingsItem);
 		logItem.setLabel("Sign in / Sign up");
 	}
 	
@@ -297,6 +346,33 @@ public class Main {
 		connectionsHandler.postCheckSecret(WindowHandler.questionEmail, WindowHandler.mLine1, WindowHandler.question);
 	}
 	/**
+	 * attempts to validate secret via connectionsHandler
+	 */
+	public static void attemptSetSecret() {
+		connectionsHandler.postNewSecret(WindowHandler.mLine2, WindowHandler.mLine3, DataModel.getEmail(), WindowHandler.mLine1);
+		
+	}
+	/**
+	 * attempts to validate secret via connectionsHandler
+	 */
+	public static void attemptSetPassword() {
+		connectionsHandler.postNewPass(WindowHandler.mLine2, DataModel.getEmail(), WindowHandler.mLine1);
+		
+	}
+	/**
+	 * attempts to validate secret via connectionsHandler
+	 */
+	public static void attemptSetDeviceName() {
+		connectionsHandler.postNewDeviceName(WindowHandler.mLine1, DataModel.getToken(), DataModel.getEmail());
+		
+	}
+	
+	
+	
+	
+	
+	
+	/**
 	 * toggles the pCap tracking on /off
 	 */
 	private static void toggle() {
@@ -311,9 +387,11 @@ public class Main {
 	 * toggles the pCap tracking on
 	 */
 	private static void toggleOn() {
+		statusItem.setLabel("Status: Monitoring");
+		
 		bolIsToggledOn = true;
 		timeHandler.startQuickTimer();
-		Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/redG.png")); 
+		Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource(res + "redG.png")); 
 		trayIcon.setImage(trayImage);
 		toggleItem.setLabel("Pause Monitoring");
 	}
@@ -321,9 +399,10 @@ public class Main {
 	 * toggles the pCap tracking off
 	 */
 	private static void toggleOff() {
+		statusItem.setLabel("Status: Online");
 		bolIsToggledOn = false;
 		timeHandler.stopQuickTimer();
-		Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/res/silverG.png")); 
+		Image trayImage = Toolkit.getDefaultToolkit().getImage(Main.class.getResource(res + "silverG.png")); 
 		trayIcon.setImage(trayImage);
 		toggleItem.setLabel("Resume Monitoring");
 	}
@@ -333,4 +412,30 @@ public class Main {
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		JOptionPane.showMessageDialog(frame, message);
 	}
+	
+	public static boolean isRetina() {
+		
+		if ( hasRetinaDisplay() ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static boolean hasRetinaDisplay() {
+		  Object obj = Toolkit.getDefaultToolkit()
+		      .getDesktopProperty(
+		          "apple.awt.contentScaleFactor");
+		  if (obj instanceof Float) {
+		    Float f = (Float) obj;
+		    int scale = f.intValue();
+		    return (scale == 2); // 1 indicates a regular mac display.
+		  }
+		  return false;
+		}
+	
+	
+	
+	
+	
 }
