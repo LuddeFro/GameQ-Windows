@@ -39,7 +39,7 @@
 		<item value="Main - GameQ-Windows" key="FatJarPackageWizardPage.LAUNCH_CONFIGURATION_SELECTION_NAME"/>
 		<item value="C:\Users\Ludvig Fröberg\Desktop\GameQ-Beta.jar" key="FatJarPackageWizardPage.DESTINATION_PATH_SELECTION"/>
 		<item value="false" key="FatJarPackageWizardPage.ANTSCRIPT_SAVE"/>
-		<item value="2" key="FatJarPackageWizardPage.LIBRARY_HANDLING"/>
+		<item value="1" key="FatJarPackageWizardPage.LIBRARY_HANDLING"/>
 		<list key="FatJarPackageWizardPage.DESTINATION_NAMES_ID">
 			<item value="C:\Users\Ludvig Fröberg\Desktop\GameQ-Beta.jar"/>
 		</list>
@@ -47,6 +47,11 @@
 			<item value="C:\Users\Ludvig Fröberg\Desktop\GameQ-Windows\workspace.xml"/>
 			<item value=".xml"/>
 		</list>
+	</section>
+	<section name="JavaBuildConfigurationBlock">
+		<item value="true" key="expanded2"/>
+		<item value="true" key="expanded1"/>
+		<item value="true" key="expanded0"/>
 	</section>
 	<section name="ClasspathContainerSelectionPage">
 		<item value="3" key="index"/>

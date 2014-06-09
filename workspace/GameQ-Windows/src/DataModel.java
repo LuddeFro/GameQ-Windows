@@ -36,8 +36,8 @@ public class DataModel {
 		
 		//filename = "C:/Users/Ludvig Fröberg/Desktop/workspace/GameQ-Windows/bin/res/stg.cdtx";
 		
-		filename = System.getProperty("user.dir") + "\\bin\\res\\stg.cdtx";
-		// filename = "C:\\Program Files\\GameQ\\stg.cdtx";
+		// filename = System.getProperty("user.dir") + "\\bin\\res\\stg.cdtx";
+		 filename = "C:\\Program Files\\GameQ\\stg.cdtx";
 		System.out.println(filename);
 		try {
 			load();

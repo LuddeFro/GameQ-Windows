@@ -118,7 +118,11 @@ public class WindowHandler {
             public void actionPerformed(ActionEvent e) {
                 if (Main.bolRegging || Main.bolAskingQuestion || Main.bolGettingQuestion) {
                 	
-                		setupLogin();
+                	setupLogin();
+                	
+                } else if (Main.bolSettingDeviceName || Main.bolSettingPass || Main.bolSettingSecret) {
+                	
+                	setupSettings();
                 	
                 } else {
                 	
@@ -448,7 +452,8 @@ public class WindowHandler {
     	btnSetSecret.setBounds(frameWidth/2-(fieldWidth+middleXOffset), frameHeight-buttonHeight*3, fieldWidth, buttonHeight);
 		btnSetPassword.setBounds(frameWidth/2-(fieldWidth+middleXOffset), frameHeight-buttonHeight*4-5, fieldWidth, buttonHeight);
 		btnSetDeviceName.setBounds(frameWidth/2-(fieldWidth+middleXOffset), frameHeight-buttonHeight*5-10, fieldWidth, buttonHeight);
-		
+		btnForgotten.setText("Cancel");
+		btnLogin.setText("OK");
 		txtSecret.setVisible(false);
 		txtSecretQ.setVisible(false);
 		txtEmail.setVisible(false);

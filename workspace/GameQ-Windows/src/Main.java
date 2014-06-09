@@ -363,6 +363,7 @@ public class Main {
 	 * attempts to validate secret via connectionsHandler
 	 */
 	public static void attemptSetDeviceName() {
+		DataModel.setDeviceName(WindowHandler.mLine1);
 		connectionsHandler.postNewDeviceName(WindowHandler.mLine1, DataModel.getToken(), DataModel.getEmail());
 		
 	}
