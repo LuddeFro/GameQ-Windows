@@ -1,2 +1,4 @@
-#Mon Jun 09 19:05:09 CEST 2014
+#Mon Jun 09 22:41:09 CEST 2014
 __DEFAULT__=true
+org.eclipse.sdk.Eclipse.master=true
+org.eclipse.help.ui.localSearch.master=true

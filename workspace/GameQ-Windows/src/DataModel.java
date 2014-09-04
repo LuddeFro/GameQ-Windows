@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
 import org.apache.commons.io.FileUtils;
@@ -22,7 +23,7 @@ public class DataModel {
 	private static String deviceName;
 	private static boolean bolIsLoggedIn;
 	private static boolean bolIsRegisteredForNotifications;
-	
+	private static String OS = System.getProperty("os.name").toLowerCase();
 	public DataModel() {
 		token = "";
 		email = "";
@@ -36,8 +37,13 @@ public class DataModel {
 		
 		//filename = "C:/Users/Ludvig Fröberg/Desktop/workspace/GameQ-Windows/bin/res/stg.cdtx";
 		
-		// filename = System.getProperty("user.dir") + "\\bin\\res\\stg.cdtx";
-		 filename = "C:\\Program Files\\GameQ\\stg.cdtx";
+		
+		if (OS.equals("windows xp")) {
+			filename = "C:/Documents and Settings/All Users/Application Data/GameQ/stg.cdtx";
+		} else {
+			filename = "C:/ProgramData/GameQ/stg.cdtx";
+		}
+		 
 		System.out.println(filename);
 		try {
 			load();

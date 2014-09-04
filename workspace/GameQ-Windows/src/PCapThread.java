@@ -3,7 +3,6 @@ import java.util.Date;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapBpfProgram;
 import org.jnetpcap.PcapIf;
-import org.jnetpcap.packet.JFlowMap;
 import org.jnetpcap.packet.JHeader;
 import org.jnetpcap.packet.JHeaderPool;
 import org.jnetpcap.packet.JPacket;
@@ -17,7 +16,7 @@ public class PCapThread implements Runnable {
 	private PcapIf device;
 	private StringBuilder errbuf;
 	//private static final String filterString = "ip";
-	private static final String filterString = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp src portrange 27015-27030 or udp dst port 27005";
+	private static final String filterString = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp src portrange 27015-28999 or udp dst port 27005";
 	public static int honQPack;
 	public static int dotaQPack;
 	public static int dotaCPack;
@@ -120,12 +119,12 @@ public class PCapThread implements Runnable {
                 System.out.println(packet.getCaptureHeader());
                 
                 
-                System.out.printf("Received packet at %s caplen=%-4d len=%-4d %s sPort="+srcPort+" dPort="+dstPort+" protocol:"+protocol+"\n",  
+                /*System.out.printf("Received packet at %s caplen=%-4d len=%-4d %s sPort="+srcPort+" dPort="+dstPort+" protocol:"+protocol+"\n",  
                     new Date(packet.getCaptureHeader().timestampInMillis()),   
                     packet.getCaptureHeader().caplen(),  // Length actually captured
                     packet.getCaptureHeader().wirelen(), // Original length 
                     user                                 // User supplied object  
-                    );  
+                    );*/  
                 
                 
                 if (dstPort <= 11335 && dstPort >= 11235) {
@@ -139,7 +138,7 @@ public class PCapThread implements Runnable {
                     
                 }
                 
-                if (dstPort == 27005) {
+                if (srcPort >= 27015 || srcPort <= 28999) {
                 	PCapThread.dotaCPack++;
                 }
                 
@@ -168,14 +167,14 @@ public class PCapThread implements Runnable {
                     
                 }
                 
-                if (srcPort >= 27015 && srcPort <= 27020 && dstPort == 27005 && len == 60) {
+                if (srcPort >= 27000 && srcPort <= 28000 && dstPort == 27005 && len == 60) {
                     
                     
                     PCapThread.csgoQPack++;
                     
                 }
                 
-                if (srcPort >= 27015 && srcPort <= 27020 && dstPort == 27005 && len >= 100 && len <= 1200) {
+                if (srcPort >= 27000 && srcPort <= 28000 && dstPort == 27005 && len >= 100 && len <= 1200) {
                     
                     
                     PCapThread.csgoGamePack++;

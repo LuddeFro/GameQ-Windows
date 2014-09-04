@@ -27,4 +27,6 @@
 			<item value="org.eclipse.team.ui.exportWizards"/>
 		</list>
 	</section>
+	<section name="ZipFileImportWizard">
+	</section>
 </section>

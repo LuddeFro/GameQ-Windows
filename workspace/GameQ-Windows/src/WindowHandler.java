@@ -1,6 +1,5 @@
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,36 +9,39 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
 
 
 
 public class WindowHandler {
 
-
-	public static final int frameWidth = 500;
-	public static final int frameHeight = 300;
 	
-	public static final int imageSize = 256;
+	private static int xMultiplier;
 	
-	public static final int middleXOffset = 10;
-    public static final int fieldWidth = 200;
-    public static final int fieldYOffset = 20;
-    public static final int fieldHeight = 25;
-    public static final int bonusFieldYOffset = fieldYOffset*2*3/4 + fieldHeight;
-    public static final int bonusField2YOffset = (bonusFieldYOffset - fieldYOffset) + bonusFieldYOffset;
-    public static final int bonusField3YOffset = (bonusFieldYOffset - fieldYOffset) + bonusField2YOffset;
-    public static final int bonusField4YOffset = (bonusFieldYOffset - fieldYOffset) + bonusField3YOffset;
-    public static final int buttonWidth = 95;
-    public static final int buttonHeight = 25;
-    public static final int buttonYOffset = fieldHeight*2 + fieldYOffset*3*3/4;
+	
+	
+	
+	public static int frameWidth = 500;
+	public static int frameHeight = 300;
+	
+	public static int imageSize = 256;
+	
+	public static int middleXOffset = 10;
+    public static int fieldWidth = 200;
+    public static int fieldYOffset = 20;
+    public static int fieldHeight = 25;
+    public static int bonusFieldYOffset = fieldYOffset*2*3/4 + fieldHeight;
+    public static int bonusField2YOffset = (bonusFieldYOffset - fieldYOffset) + bonusFieldYOffset;
+    public static int bonusField3YOffset = (bonusFieldYOffset - fieldYOffset) + bonusField2YOffset;
+    public static int bonusField4YOffset = (bonusFieldYOffset - fieldYOffset) + bonusField3YOffset;
+    public static int buttonWidth = 95;
+    public static int buttonHeight = 25;
+    public static int buttonYOffset = fieldHeight*2 + fieldYOffset*3*3/4;
     
     public static JTextField txtEmail;
 	public static JPasswordField txtPassword;
@@ -80,6 +82,26 @@ public class WindowHandler {
     	if (frame == null) {
 			frame = new JFrame("GameQ");
 		}
+    	if (Main.isRetina()) {
+    		frameWidth *=2;
+    		frameHeight *=2;
+    		
+    		imageSize *=2;
+    		
+    		middleXOffset *=2;
+    	    fieldWidth *=2;
+    	    fieldYOffset *=2;
+    	    fieldHeight *=2;
+    	    bonusFieldYOffset *=2;
+    	    bonusField2YOffset *=2;
+    	    bonusField3YOffset *=2;
+    	    bonusField4YOffset *=2;
+    	    buttonWidth *=2;
+    	    buttonHeight *=2;
+    	    buttonYOffset *=2;
+    	}
+    	
+    	
     	Color myWhite = new Color(1.0f, 1.0f, 1.0f, 1.0f);
         Color myTransWhite = new Color(1.0f, 1.0f, 1.0f, 0.5f);
         Color myRed = new Color(0.905f, 0.298f, 0.235f, 1.0f);
@@ -334,7 +356,7 @@ public class WindowHandler {
 		
 		try {
 			BufferedImage image;
-			image = ImageIO.read(Main.class.getResource(Main.res + "256black.png"));
+			image = ImageIO.read(Main.class.getResource(Main.res + "bigG.png"));
 			label = new JLabel(new ImageIcon(image));
 	        frame.getContentPane().add(label);
 	        label.setBounds((frameWidth/2 - imageSize)/2 + frameWidth/2  -middleXOffset/2, (frameHeight - imageSize)/2-middleXOffset*2, imageSize, imageSize);

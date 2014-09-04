@@ -1,0 +1,440 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TimerTask;
+
+import javax.swing.Timer;
+
+
+public class TimeHandler {
+	public Timer quickTimer;
+	public Timer timeTimer;
+	private static final int quickSpeedMillis = 1000;
+	private static final int timeSpeedMillis = 60000;
+	private Buffer dotaQBuffer;
+	private Buffer dotaCBuffer;
+	private Buffer honQBuffer;
+	public Buffer dota174Buffer;
+	public Buffer dota190Buffer;
+	private Buffer dota206Buffer;
+	private Buffer csgoQBuffer;
+	private Buffer csgoGameBuffer;
+	private boolean bolQueueCD; 
+	private boolean bolCSGOCD; 
+	private boolean bolFirstTick;
+	private ConnectionHandler connectionsHandler;
+	
+	private Timer timerCSGO;
+	private Timer timerQueueCD;
+	
+	private static final int kNOGAME = 0;
+	private static final int kHEROES_OF_NEWERTH = 1;
+	private static final int kDOTA2 = 2;
+	private static final int kCS_GO = 3;
+	private static final int kOFFLINE = 0; //app running, but no game
+	private static final int kONLINE = 1; //game running
+	private static final int kINGAME = 2; //game running and in match
+	private static final int kNotRunningGameQ = 4; //self explanatory
+	private static final int kNUMBER_OF_GAMES = 4; //kNOGAME counts as 1
+	
+	private boolean[] inGameArray;
+	private boolean[] onlineArray;
+	
+	
+	
+	
+	
+	
+	public TimeHandler() {
+		honQBuffer = new Buffer(5);
+		dotaQBuffer = new Buffer(5);
+		dotaCBuffer = new Buffer(5);
+		dota174Buffer = new Buffer(6);
+		dota190Buffer = new Buffer(4);
+		dota206Buffer = new Buffer(3);
+		csgoGameBuffer = new Buffer(5);
+		csgoQBuffer = new Buffer(3);
+		
+		bolQueueCD = false;
+		inGameArray = new boolean[kNUMBER_OF_GAMES];
+		onlineArray = new boolean[kNUMBER_OF_GAMES];
+		connectionsHandler = new ConnectionHandler();
+		bolFirstTick = true;
+	}
+	
+	
+	
+	
+	
+	public void startTimeTimer() {
+		TimeTimerHandler handler = new TimeTimerHandler();
+		if (timeTimer != null) {
+			if (timeTimer.isRunning()) {
+				timeTimer.restart();
+				return;
+			} 
+		} 
+		
+		timeTimer = new Timer(timeSpeedMillis, handler);
+		timeTimer.start();
+	}
+	
+	public void stopTimeTimer() {
+		timeTimer.stop();
+	}
+	
+	public void startQuickTimer() {
+		QuickTimerHandler handler = new QuickTimerHandler();
+		PCapThread.dotaCPack = 0;
+		PCapThread.dotaQPack = 0;
+		PCapThread.honQPack = 0;
+		PCapThread.dota206Pack = 0;
+		PCapThread.dota190Pack = 0;
+		PCapThread.dota174Pack = 0;
+		PCapThread.csgoGamePack = 0;
+		PCapThread.csgoQPack = 0;
+		bolFirstTick = true;
+		if (quickTimer != null) {
+			if (quickTimer.isRunning()) {
+				quickTimer.restart();
+				return;
+			} 
+		} 
+		
+		quickTimer = new Timer(quickSpeedMillis, handler);
+		quickTimer.start();
+	}
+	
+	public void stopQuickTimer() {
+		if (quickTimer != null) {
+			quickTimer.stop();
+		}
+	}
+	
+	public class QuickTimerHandler implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+
+			//System.out.println("tick");
+		    
+			List<String> processes = listRunningProcesses();
+		      String result = "";
+
+		      // display the result 
+		      Iterator<String> it = processes.iterator();
+		      int i = 0;
+		      while (it.hasNext()) {
+		         result += it.next() +",";
+		         i++;
+		         if (i==10) {
+		             result += "\n";
+		             i = 0;
+		         }
+		      }
+		      //----
+		    System.out.println("<<<processes checked>>>");
+		    
+		    //-------------------check processes------------------
+		    boolean honRunning = false;
+		    boolean dotaRunning = false;
+		    boolean csgoRunning = false;
+		    if (!result.contains("hon.exe")) {
+		        honRunning = false;
+		        //NSLog(@"hon not running, false alarm");
+		    } else {
+		        honRunning = true;
+		        //NSLog(@"hon running, probably true alarm");
+		    }
+		    if (!result.contains("dota.exe")) {
+		        dotaRunning = false;
+		        //NSLog(@"dota not running, false alarm");
+		    } else {
+		        dotaRunning = true;
+		        //NSLog(@"dota running, probably true alarm");
+		    }
+		    if (!result.contains("csgo.exe")) {
+		        csgoRunning = false;
+		        //NSLog(@"csgo not running, false alarm");
+		    } else {
+		        csgoRunning = true;
+		        //NSLog(@"csgo running, probably true alarm");
+		    }
+
+
+		    dotaQBuffer.increment(PCapThread.dotaQPack);
+		    dotaCBuffer.increment(PCapThread.dotaCPack);
+		    honQBuffer.increment(PCapThread.honQPack);
+		    dota174Buffer.increment(PCapThread.dota174Pack);
+		    dota190Buffer.increment(PCapThread.dota190Pack);
+		    dota206Buffer.increment(PCapThread.dota206Pack);
+		    System.out.println("integer in pcapthread:" + PCapThread.csgoQPack);
+		    csgoQBuffer.increment(PCapThread.csgoQPack);
+		    csgoGameBuffer.increment(PCapThread.csgoGamePack);
+		    
+		    
+		    PCapThread.dotaCPack = 0;
+		    PCapThread.dotaQPack = 0;
+		    PCapThread.honQPack = 0;
+		    PCapThread.dota174Pack = 0;
+		    PCapThread.dota190Pack = 0;
+		    PCapThread.dota206Pack = 0;
+		    PCapThread.csgoQPack = 0;
+		    PCapThread.csgoGamePack = 0;
+
+		    System.out.println("cleared in pcapthread:" + PCapThread.csgoQPack);
+		    
+		    int honQ = honQBuffer.bufferValue();
+		    int dotaQ = dotaQBuffer.bufferValue();
+		    int dotaC = dotaCBuffer.bufferValue();
+		    int dota174 = dota174Buffer.bufferValue();
+		    int dota190 = dota190Buffer.bufferValue();
+		    int dota206 = dota206Buffer.bufferValue();
+		    int csgoQ = csgoQBuffer.bufferValue();
+		    int csgoGame = csgoGameBuffer.bufferValue();
+		    
+
+		    System.out.println("bufferValue:" + csgoQ);
+		    
+		    
+		    // ---------------- HON handler ----------------------
+		    //NSLog(@"HoN");
+		    if (honQ > 10 && honRunning) {
+		        // user is in game
+		    	queuePopIfNotInGame(kHEROES_OF_NEWERTH);
+		        inGame(kHEROES_OF_NEWERTH);
+		    } else if (honRunning){
+		        online(kHEROES_OF_NEWERTH);
+		        //got no packets but it's on
+		    } else {
+		        // user is not in game
+		    	offline(kHEROES_OF_NEWERTH);
+		    }
+		   
+		    // -------------- HON handler end --------------------
+		    
+		    
+		    // ---------------- DOTA handler ----------------------
+		    
+		    
+		    
+		    if (/*(dotaQ > 1 && dotaRunning) || */(dotaRunning && dota174 > 0 && dota190 > 0 && dota206 > 0 && ((dota206 + dota190) >= 4))) {
+		        queuePopIfNotInGame(kDOTA2); //potentially sends notification
+		    } else if (dotaC > 40 && dotaRunning) {
+		        // user is in game
+		        //tricks the app in to not sending a notification
+		        // this is not the queue pop, but the fact of being in a game
+		        inGame(kDOTA2);
+		    } else if (dotaRunning){
+		    	online(kDOTA2);
+		    } else {
+		        // user is not in game
+		    	offline(kDOTA2);
+		    }
+		    // -------------- DOTA handler end --------------------
+		    
+		    // ---------------- CSGO handler ----------------------
+		    
+		    
+		    
+		    
+		    if (csgoGame > 40 && csgoRunning) {
+		    	System.out.println("csgo1");
+		        // user is in game
+		    	if (!bolCSGOCD) {
+		    		queuePopIfNotInGame(kCS_GO);
+		    	}
+		        inGame(kCS_GO);
+		        if (timerCSGO != null) 
+		        {
+		        	timerCSGO.restart();
+		        	
+		        }  else {
+		        	timerCSGO = new Timer(30*1000, (new resetCsgoCDTask()));
+			        timerCSGO.start(); 
+		        }
+		    } else if (csgoQ >= 2 && csgoRunning) {
+		    	System.out.println("csgo2");
+		    	queuePopIfNotInGame(kCS_GO);
+		    	bolCSGOCD = true;
+		    	if (timerCSGO != null) 
+		        {
+		        	timerCSGO.restart();
+		        	
+		        }  else {
+		        	timerCSGO = new Timer(30*1000, (new resetCsgoCDTask()));
+			        timerCSGO.start(); 
+		        }
+		    } else if (csgoRunning){
+		    	System.out.println("csgo3");
+		    	online(kCS_GO);
+		    } else {
+		    	System.out.println("csgo4");
+		        // user is not in game
+		    	offline(kCS_GO);
+		    }
+		    // -------------- CSGO handler end --------------------
+		    
+		    
+		    
+		    
+		    
+		    
+		    bolFirstTick = false;
+		    //NSLog(@"");
+			
+		}
+		
+	}
+	
+	class resetCsgoCDTask implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			bolCSGOCD = false;
+			timerCSGO.stop();
+			
+		}
+	  }
+	class resetQueueCDTask implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			bolQueueCD = false;
+			timerQueueCD.stop();
+			
+		}
+	  }
+	
+	
+	
+	public class TimeTimerHandler implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			connectionsHandler.postTimeUpdate(DataModel.getToken());
+			
+		}
+		
+	}
+	
+	
+	public void offline(int game) {
+		boolean bolOnline = onlineArray[game];
+		onlineArray[game] = false;
+		inGameArray[game] = false;
+		for (boolean bol : inGameArray) {
+			if (bol == true) {
+				return;
+			}
+		}
+		for (boolean bol : onlineArray) {
+			if (bol == true) {
+				return;
+			}
+		}
+		if (!bolOnline) {
+			// do nothing if status was already offline, (initialized to offline)
+		} else {
+			connectionsHandler.postStatusUpdate(game, kOFFLINE, DataModel.getToken());
+		}
+	}
+	
+	public void online(int game) {
+		if (bolQueueCD) {
+			return;
+		} 
+		boolean bolWasInGame = inGameArray[game];
+		inGameArray[game] = false;
+		for (boolean bol : inGameArray) {
+			if (bol == true) {
+				return;
+			}
+		}
+		if (onlineArray[game] && !bolWasInGame) {
+			// do nothing if status already online, (initialized to offline)
+		} else {
+			connectionsHandler.postStatusUpdate(game, kONLINE, DataModel.getToken());
+		}
+		onlineArray[game] = true;
+		inGameArray[game] = false;
+	}
+
+	public void inGame(int game) {
+		if (inGameArray[game]){
+			//do nothing
+		} else if (!inGameArray[game]) {
+			connectionsHandler.postStatusUpdate(game, kINGAME, DataModel.getToken());
+			System.out.println("pushing");
+			inGameArray[game] = true;
+			onlineArray[game] = true;
+		}
+		bolQueueCD = true;
+		if (timerQueueCD != null) 
+        {
+			timerQueueCD.restart();
+        	
+        }  else {
+        	timerQueueCD = new Timer(5*1000, (new resetQueueCDTask()));
+        	timerQueueCD.start(); 
+        }
+	}
+	
+	public void queuePopIfNotInGame(int game)
+	{
+		if (bolQueueCD) {
+	        return;
+	    }
+		if (inGameArray[game]){
+	        //do nothing
+	    } else if(!inGameArray[game]) {
+	    	connectionsHandler.postPush(game, DataModel.getToken(), DataModel.getEmail());
+	    	System.out.println("Pushing game: " + game);
+	    }
+	    bolQueueCD = true;
+	    if (timerQueueCD != null) 
+        {
+			timerQueueCD.restart();
+        	
+        }  else {
+        	timerQueueCD = new Timer(5*1000, (new resetQueueCDTask()));
+        	timerQueueCD.start(); 
+        }
+	}
+	
+	public static List<String> listRunningProcesses() {
+	    List<String> processes = new ArrayList<String>();
+	    try {
+	      String line;
+	      Process p = Runtime.getRuntime().exec("tasklist.exe /fo csv /nh");
+	      BufferedReader input = new BufferedReader
+	          (new InputStreamReader(p.getInputStream()));
+	      while ((line = input.readLine()) != null) {
+	          if (!line.trim().equals("")) {
+	              // keep only the process name
+	              processes.add(line);
+	          }
+
+	      }
+	      input.close();
+	    }
+	    catch (Exception err) {
+	      err.printStackTrace();
+	    }
+	    return processes;
+	  }
+		
+		
+}
+	
+	
+	
+	
+	
+	
+	
+	

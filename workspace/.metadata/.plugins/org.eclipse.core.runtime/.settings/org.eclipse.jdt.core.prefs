@@ -1,16 +1,17 @@
 eclipse.preferences.version=1
 org.eclipse.jdt.core.builder.resourceCopyExclusionFilter=
 org.eclipse.jdt.core.classpathVariable.ECLIPSE_HOME=C\:/Users/Ludvig Fr\u00F6berg/Desktop/GameQ-Windows/eclipse
-org.eclipse.jdt.core.classpathVariable.JRE_LIB=C\:/Program Files/Java/jre8/lib/rt.jar
-org.eclipse.jdt.core.classpathVariable.JRE_SRC=
+org.eclipse.jdt.core.classpathVariable.JRE_LIB=C\:/Program Files/Java/jdk1.8.0_05/jre/lib/rt.jar
+org.eclipse.jdt.core.classpathVariable.JRE_SRC=C\:/Program Files/Java/jdk1.8.0_05/src.zip
 org.eclipse.jdt.core.classpathVariable.JRE_SRCROOT=
 org.eclipse.jdt.core.classpathVariable.JUNIT_HOME=C\:/Users/Ludvig Fr\u00F6berg/Desktop/GameQ-Windows/eclipse/plugins/org.junit_4.11.0.v201303080030/
 org.eclipse.jdt.core.classpathVariable.JUNIT_SRC_HOME=C\:/Users/Ludvig Fr\u00F6berg/Desktop/GameQ-Windows/eclipse/plugins/org.junit.source_4.11.0.v201303080030.jar
+org.eclipse.jdt.core.classpathVariable.libpath=C\:/libraries/jnetpcap-1.3.0
 org.eclipse.jdt.core.codeComplete.visibilityCheck=enabled
 org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=disabled
 org.eclipse.jdt.core.compiler.problem.forbiddenReference=warning
 org.eclipse.jdt.core.compiler.taskCaseSensitive=enabled
 org.eclipse.jdt.core.compiler.taskPriorities=NORMAL,HIGH,NORMAL
 org.eclipse.jdt.core.compiler.taskTags=TODO,FIXME,XXX
-org.eclipse.jdt.core.userLibrary.JNetPCap=<?xml version\="1.0" encoding\="UTF-8"?>\r\n<userlibrary systemlibrary\="false" version\="2">\r\n\t<archive path\="C\:/Users/Ludvig Fr\u00F6berg/Desktop/jnetpcap-1.3.0/jnetpcap.jar" sourceattachment\="C\:/Users/Ludvig Fr\u00F6berg/Desktop/jnetpcap-src-1.3.0-1.zip">\r\n\t\t<attributes>\r\n\t\t\t<attribute name\="javadoc_location" value\="jar\:file\:/C\:/Users/Ludvig%20Fr\u00F6berg/Desktop/jnetpcap-javadoc-1.3.0-1.zip\!/"/>\r\n\t\t\t<attribute name\="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value\="C\:/Users/Ludvig Fr\u00F6berg/Desktop/jnetpcap-1.3.0"/>\r\n\t\t</attributes>\r\n\t</archive>\r\n</userlibrary>\r\n
-org.eclipse.jdt.core.userLibrary.apache-commons-lang=<?xml version\="1.0" encoding\="UTF-8"?>\r\n<userlibrary systemlibrary\="false" version\="2">\r\n\t<archive path\="C\:/Users/Ludvig Fr\u00F6berg/Desktop/commons-io-2.4/commons-io-2.4.jar" sourceattachment\="C\:/Users/Ludvig Fr\u00F6berg/Desktop/commons-io-2.4/commons-io-2.4-sources.jar">\r\n\t\t<attributes>\r\n\t\t\t<attribute name\="javadoc_location" value\="jar\:file\:/C\:/Users/Ludvig%20Fr\u00F6berg/Desktop/commons-io-2.4/commons-io-2.4-javadoc.jar\!/"/>\r\n\t\t</attributes>\r\n\t</archive>\r\n</userlibrary>\r\n
+org.eclipse.jdt.core.userLibrary.JNetPCap=<?xml version\="1.0" encoding\="UTF-8"?>\r\n<userlibrary systemlibrary\="false" version\="2">\r\n\t<archive path\="C\:/libraries/jnetpcap-1.3.0/jnetpcap.jar" sourceattachment\="C\:/libraries/jnetpcap-src-1.3.0-1.zip">\r\n\t\t<attributes>\r\n\t\t\t<attribute name\="javadoc_location" value\="jar\:file\:/C\:/libraries/jnetpcap-javadoc-1.3.0-1.zip\!/"/>\r\n\t\t\t<attribute name\="source_encoding" value\="UTF-8"/>\r\n\t\t\t<attribute name\="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value\="C\:/libraries/jnetpcap-1.3.0"/>\r\n\t\t</attributes>\r\n\t</archive>\r\n</userlibrary>\r\n
+org.eclipse.jdt.core.userLibrary.apache-commons-lang=<?xml version\="1.0" encoding\="UTF-8"?>\r\n<userlibrary systemlibrary\="false" version\="2">\r\n\t<archive path\="C\:/libraries/commons-io-2.4/commons-io-2.4.jar" sourceattachment\="C\:/libraries/commons-io-2.4/commons-io-2.4-sources.jar">\r\n\t\t<attributes>\r\n\t\t\t<attribute name\="javadoc_location" value\="jar\:file\:/C\:/libraries/commons-io-2.4/commons-io-2.4-javadoc.jar\!/"/>\r\n\t\t</attributes>\r\n\t</archive>\r\n</userlibrary>\r\n

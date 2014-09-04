@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 public class ConnectionHandler {
 	private boolean disconnected;
 	private final String USER_AGENT = "GQWindows/1.0";
-	private final String ServerURL = "http://185.2.155.172/GameQ_Server_Code";
+	private final String ServerURL = "http://54.76.41.235/GameQ_Server_Code";
 	
 	
 
@@ -149,6 +149,7 @@ public class ConnectionHandler {
 	
 	private String post(String urlParameters, String urlPath) {
 		Main.windowHandler.disableAll();
+		
 		String url = ServerURL + urlPath;
 		URL obj = null;
 		String returnString = null;
@@ -196,7 +197,9 @@ public class ConnectionHandler {
 			// Send post request
 			con.setDoOutput(true);
 			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-			wr.writeBytes(urlParameters);
+			byte[] buf = urlParameters.getBytes("UTF-8");
+			wr.write(buf, 0, buf.length);
+			//wr.writeBytes(urlParameters);
 			wr.flush();
 			wr.close();
 
@@ -265,7 +268,7 @@ public class ConnectionHandler {
 	            if (response.equals("1.0")) {
 	            	return "@string/alt1";
 	            } else {
-	            	Main.alert("A new version of GameQ is available at GameQ.io");
+	            	Main.alert("A new version of GameQ is available at www.GameQ.io");
 	    	        return "@string/alt0";
 	            }
 	        }
@@ -317,6 +320,18 @@ public class ConnectionHandler {
 	        		+ "Use this password only for your first log in to activate your account!");
 	        Main.windowHandler.setupLogin();
 	        return "@string/alt1";
+	    }
+	    if (response.equals("signing upmailerr"))
+	    {
+	        alert("Welcome to GameQ, you can sign in immediately!");
+	        Main.windowHandler.setupLogin();
+	        return "@string/alt1";
+	    }
+	    if (response.equals("signing upmailerrno"))
+	    {
+	        alert("A problem has occured, please contact support.");
+	        Main.windowHandler.setupLogin();
+	        return "@string/altx";
 	    }
 	    // user already exists, registration failed
 	    if (response.equals("duplicate"))
@@ -377,8 +392,7 @@ public class ConnectionHandler {
 	    }
 	    
 	    if (response.equals("pwdreset")) {
-	    	Main.alert("Your password has successfully been reset! A new one has been sent to your e-mail. "
-	    			+ "You should login and change this password as soon as possible.");
+	    	Main.alert("Your password has successfully been reset! A new one has been sent to your e-mail.");
 	    	WindowHandler.txtEmail.setText("");
 	    	Main.windowHandler.setupLogin();
 	    	return "@string/alt1";

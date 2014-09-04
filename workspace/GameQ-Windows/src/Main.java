@@ -1,5 +1,4 @@
 import java.awt.AWTException;
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -8,16 +7,15 @@ import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.SocketException;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 public class Main {
 	
@@ -43,6 +41,7 @@ public class Main {
     public static TimeHandler timeHandler;
     public static Encryptor enc;
     private static boolean bolIsToggledOn;
+    private static ServerSocket ss;
     public static String res;
     
     
@@ -53,6 +52,26 @@ public class Main {
 		} else {
 			res = "/res/";
 		}
+		
+		    
+		        try
+		        {
+		            ss = new ServerSocket();
+		            ss.bind(new InetSocketAddress(38623));
+		            System.out.println("Application started");
+		        }
+		        catch (SocketException e)
+		        {
+		            System.out.println("Application already running");
+		            System.exit(1);
+		        }
+		        catch(Exception e)
+		        {
+		            System.out.println("Application encountered some problem.");
+		            System.exit(1);
+		        }
+		    
+		
 		bolRegging = false;
 		bolGettingQuestion = false;
 		bolAskingQuestion = false;
@@ -211,6 +230,9 @@ public class Main {
 	             System.err.println(e);
 	         }
 	         // setup pCap
+	         
+	         
+	         System.loadLibrary("jnetpcap");
 	         System.out.println("starting pCap");
 	         packetHandler = new PacketHandler();
 	         System.out.println("started pCap");
@@ -299,6 +321,7 @@ public class Main {
 		popup.remove(toggleItem);
 		popup.remove(settingsItem);
 		logItem.setLabel("Sign in / Sign up");
+		windowHandler.setupWindow();
 	}
 	
 	/**

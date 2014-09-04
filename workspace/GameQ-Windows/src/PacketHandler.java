@@ -2,10 +2,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Timer;
-
-import org.jnetpcap.Pcap;
-import org.jnetpcap.PcapIf;
+import org.jnetpcap.*;
+//import org.jnetpcap.Pcap;
+//import org.jnetpcap.PcapIf;
 
 
 
@@ -20,8 +19,6 @@ public class PacketHandler {
 		StringBuilder errbuf = new StringBuilder(); // For any error msgs 
 		//list devices on the system
 		int r = Pcap.findAllDevs(alldevs, errbuf); 
-		Main.alert("it works!");
-		
         if (r == Pcap.NOT_OK || alldevs.isEmpty()) { 
         	
             System.err.printf("Can't read list of devices, error is %s", errbuf  
